@@ -51,18 +51,28 @@ export function CardListSection({
 }: CardListSectionProps) {
 	return (
 		<Stack spacing={1.5}>
-			<Typography variant="h6">{title}</Typography>
+			<Typography variant="h6" sx={{ fontWeight: 700, px: 0.5 }}>
+				{title}
+			</Typography>
 			{cards.length === 0 ? (
 				<Typography color="text.secondary">Нет карточек в этом разделе.</Typography>
 			) : null}
 			{cards.map((card) => (
-				<Card key={card.id} sx={{ borderLeft: `12px solid ${card.color}` }}>
+				<Card
+					key={card.id}
+					sx={{
+						borderLeft: `10px solid ${card.color}`,
+						overflow: "hidden",
+					}}
+				>
 					<CardContent>
 						<Stack spacing={1.2}>
 							<Stack direction="row" justifyContent="space-between" alignItems="center">
 								<Stack direction="row" spacing={1} alignItems="center">
 									<LoyaltyIcon fontSize="small" />
-									<Typography variant="subtitle1">{card.storeName}</Typography>
+									<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+										{card.storeName}
+									</Typography>
 								</Stack>
 								{card.isFavorite ? <StarIcon color="warning" fontSize="small" /> : <StarBorderIcon fontSize="small" />}
 							</Stack>
@@ -72,7 +82,8 @@ export function CardListSection({
 									label={card.usageCount}
 									size="small"
 									sx={{
-										bgcolor: isOnline ? "grey.200" : "success.light",
+										bgcolor: isOnline ? "grey.100" : "success.light",
+										fontWeight: 600,
 									}}
 								/>
 								{showDistance && distanceLabel(card, userPosition) ? (
@@ -81,7 +92,8 @@ export function CardListSection({
 										label={distanceLabel(card, userPosition)}
 										size="small"
 										sx={{
-											bgcolor: isOnline ? "success.light" : "grey.200",
+											bgcolor: isOnline ? "success.light" : "grey.100",
+											fontWeight: 600,
 										}}
 									/>
 								) : null}
@@ -94,9 +106,9 @@ export function CardListSection({
 									size="small"
 									sx={{
 										justifyContent: "flex-start",
-										textTransform: "none",
 										width: "fit-content",
 										minWidth: 0,
+										borderRadius: 2.5,
 									}}
 								>
 									<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
@@ -110,7 +122,7 @@ export function CardListSection({
 										sx={{
 											border: "1px solid",
 											borderColor: "divider",
-											borderRadius: 1.5,
+											borderRadius: 2.5,
 										}}
 									>
 										<EditIcon fontSize="small" />
@@ -122,7 +134,7 @@ export function CardListSection({
 										sx={{
 											border: "1px solid",
 											borderColor: "error.main",
-											borderRadius: 1.5,
+											borderRadius: 2.5,
 										}}
 										onClick={() => onDelete(card.id)}
 									>

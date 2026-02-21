@@ -5,6 +5,8 @@ import {
 	Box,
 	Button,
 	Container,
+	Fab,
+	Paper,
 	Stack,
 	Typography,
 } from "@mui/material";
@@ -108,14 +110,42 @@ export function HomePage() {
 	}, [cards, isOnline, position, storeCoordsByName]);
 
 	return (
-		<Container maxWidth="sm" sx={{ py: 3 }}>
+		<Container
+			maxWidth="sm"
+			sx={{
+				pt: { xs: 1, sm: 2 },
+				pb: "calc(96px + env(safe-area-inset-bottom))",
+			}}
+		>
 			<Stack spacing={2}>
-				<Stack direction="row" justifyContent="space-between" alignItems="center">
-					<Typography variant="h5">Скидочные карты</Typography>
-					<Button component={Link} href="/cards/new" variant="contained" startIcon={<AddIcon />}>
-						Добавить
-					</Button>
-				</Stack>
+				<Paper
+					elevation={0}
+					sx={{
+						px: 2,
+						py: 1.5,
+						borderRadius: 3,
+						bgcolor: "background.paper",
+						border: "1px solid",
+						borderColor: "divider",
+					}}
+				>
+					<Stack direction="row" justifyContent="space-between" alignItems="center">
+						<Typography variant="h5" sx={{ fontWeight: 700 }}>
+							Скидочные карты
+						</Typography>
+						<Button
+							variant="text"
+							size="small"
+							disableRipple
+							sx={{
+								color: isOnline ? "success.main" : "warning.main",
+								fontWeight: 600,
+							}}
+						>
+							{isOnline ? "Онлайн" : "Офлайн"}
+						</Button>
+					</Stack>
+				</Paper>
 
 				{loading ? <Typography color="text.secondary">Загрузка карточек...</Typography> : null}
 
@@ -124,9 +154,10 @@ export function HomePage() {
 						sx={{
 							border: "1px dashed",
 							borderColor: "divider",
-							borderRadius: 2,
-							py: 4,
-							px: 2,
+							borderRadius: 3,
+							py: 5,
+							px: 2.5,
+							bgcolor: "background.paper",
 						}}
 					>
 						<Typography>Карточек пока нет. Добавьте первую карточку.</Typography>
@@ -160,6 +191,19 @@ export function HomePage() {
 					/>
 				) : null}
 			</Stack>
+			<Fab
+				component={Link}
+				href="/cards/new"
+				color="primary"
+				aria-label="Добавить карточку"
+				sx={{
+					position: "fixed",
+					right: 20,
+					bottom: "calc(20px + env(safe-area-inset-bottom))",
+				}}
+			>
+				<AddIcon />
+			</Fab>
 		</Container>
 	);
 }
