@@ -70,46 +70,49 @@ export function CardListSection({
 									<Chip icon={<NearMeIcon />} label={distanceLabel(card, userPosition)} size="small" color="primary" />
 								) : null}
 							</Stack>
-							<Stack direction="row" spacing={1} alignItems="center">
+							<Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
 								<Button
 									component={Link}
 									href={`/cards/${card.id}/use`}
 									variant="outlined"
 									size="small"
 									sx={{
-										flexGrow: 1,
 										justifyContent: "flex-start",
 										textTransform: "none",
+										width: "fit-content",
+										minWidth: 0,
 									}}
 								>
 									<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
 								</Button>
-								<IconButton
-									component={Link}
-									href={`/cards/${card.id}/edit`}
-									size="small"
-									aria-label="Редактировать"
-									sx={{
-										border: "1px solid",
-										borderColor: "divider",
-										borderRadius: 1.5,
-									}}
-								>
-									<EditIcon fontSize="small" />
-								</IconButton>
-								<IconButton
-									color="error"
-									size="small"
-									aria-label="Удалить"
-									sx={{
-										border: "1px solid",
-										borderColor: "error.main",
-										borderRadius: 1.5,
-									}}
-									onClick={() => onDelete(card.id)}
-								>
-									<DeleteOutlineIcon fontSize="small" />
-								</IconButton>
+								<Stack direction="row" spacing={1} alignItems="center">
+									<IconButton
+										component={Link}
+										href={`/cards/${card.id}/edit`}
+										size="small"
+										aria-label="Редактировать"
+										sx={{
+											border: "1px solid",
+											borderColor: "divider",
+											borderRadius: 1.5,
+										}}
+									>
+										<EditIcon fontSize="small" />
+									</IconButton>
+									<IconButton
+										color="error"
+										size="small"
+										aria-label="Удалить"
+										sx={{
+											border: "1px solid",
+											borderColor: "error.main",
+											borderRadius: 1.5,
+										}}
+										onClick={() => onDelete(card.id)}
+									>
+										<DeleteOutlineIcon fontSize="small" />
+									</IconButton>
+								</Stack>
 							</Stack>
 						</Stack>
 					</CardContent>
