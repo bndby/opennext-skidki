@@ -67,7 +67,6 @@ export function CardListSection({
 							</Stack>
 							<Stack direction="row" spacing={1} flexWrap="wrap">
 								<Chip icon={<TrendingUpIcon />} label={card.usageCount} size="small" />
-								<Chip label={card.barcodeFormat || "CODE128"} size="small" variant="outlined" />
 								{showDistance && distanceLabel(card, userPosition) ? (
 									<Chip icon={<NearMeIcon />} label={distanceLabel(card, userPosition)} size="small" color="primary" />
 								) : null}
