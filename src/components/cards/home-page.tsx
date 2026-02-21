@@ -2,7 +2,6 @@
 
 import AddIcon from "@mui/icons-material/Add";
 import {
-	Alert,
 	Box,
 	Button,
 	Container,
@@ -118,12 +117,6 @@ export function HomePage() {
 					</Button>
 				</Stack>
 
-				<Alert severity={isOnline ? "success" : "info"}>
-					{isOnline
-						? "Интернет доступен: сортировка по расстоянию до магазина (если определены координаты)."
-						: "Интернета нет: сортировка по частоте использования."}
-				</Alert>
-
 				{loading ? <Typography color="text.secondary">Загрузка карточек...</Typography> : null}
 
 				{!loading && cards.length === 0 ? (
@@ -146,6 +139,7 @@ export function HomePage() {
 						cards={sorted.favorites}
 						userPosition={position}
 						showDistance={isOnline}
+						isOnline={isOnline}
 						onDelete={async (id) => {
 							await removeCard(id);
 							await loadCards();
@@ -158,6 +152,7 @@ export function HomePage() {
 						cards={sorted.regular}
 						userPosition={position}
 						showDistance={isOnline}
+						isOnline={isOnline}
 						onDelete={async (id) => {
 							await removeCard(id);
 							await loadCards();

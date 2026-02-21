@@ -28,6 +28,7 @@ type CardListSectionProps = {
 	cards: DiscountCard[];
 	userPosition: GeoPoint | null;
 	showDistance: boolean;
+	isOnline: boolean;
 	onDelete: (id: string) => Promise<void>;
 };
 
@@ -45,6 +46,7 @@ export function CardListSection({
 	cards,
 	userPosition,
 	showDistance,
+	isOnline,
 	onDelete,
 }: CardListSectionProps) {
 	return (
@@ -65,9 +67,23 @@ export function CardListSection({
 								{card.isFavorite ? <StarIcon color="warning" fontSize="small" /> : <StarBorderIcon fontSize="small" />}
 							</Stack>
 							<Stack direction="row" spacing={1} flexWrap="wrap">
-								<Chip icon={<TrendingUpIcon />} label={card.usageCount} size="small" />
+								<Chip
+									icon={<TrendingUpIcon />}
+									label={card.usageCount}
+									size="small"
+									sx={{
+										bgcolor: isOnline ? "grey.200" : "success.light",
+									}}
+								/>
 								{showDistance && distanceLabel(card, userPosition) ? (
-									<Chip icon={<NearMeIcon />} label={distanceLabel(card, userPosition)} size="small" color="primary" />
+									<Chip
+										icon={<NearMeIcon />}
+										label={distanceLabel(card, userPosition)}
+										size="small"
+										sx={{
+											bgcolor: isOnline ? "success.light" : "grey.200",
+										}}
+									/>
 								) : null}
 							</Stack>
 							<Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
