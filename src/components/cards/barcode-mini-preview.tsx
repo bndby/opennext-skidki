@@ -1,0 +1,65 @@
+"use client";
+
+import { Box } from "@mui/material";
+import JsBarcode from "jsbarcode";
+import { useEffect, useMemo, useRef } from "react";
+
+type BarcodeMiniPreviewProps = {
+	value: string;
+	format: string;
+};
+
+const JS_BARCODE_FORMATS = new Set([
+	"CODE128",
+	"CODE39",
+	"EAN13",
+	"EAN8",
+	"UPC",
+	"UPCA",
+	"ITF14",
+]);
+
+export function BarcodeMiniPreview({ value, format }: BarcodeMiniPreviewProps) {
+	const svgRef = useRef<SVGSVGElement | null>(null);
+
+	const normalizedFormat = useMemo(() => {
+		const upper = format.toUpperCase();
+		return JS_BARCODE_FORMATS.has(upper) ? upper : "CODE128";
+	}, [format]);
+
+	useEffect(() => {
+		if (!svgRef.current || !value.trim()) {
+			return;
+		}
+
+		try {
+			JsBarcode(svgRef.current, value, {
+				format: normalizedFormat,
+				displayValue: false,
+				lineColor: "#000000",
+				background: "#ffffff",
+				height: 32,
+				margin: 6,
+				width: 1.2,
+			});
+		} catch {
+			// Невалидный формат/значение - в списке просто скрываем превью.
+		}
+	}, [normalizedFormat, value]);
+
+	return (
+		<Box
+			sx={{
+				display: "inline-flex",
+				border: "1px solid",
+				borderColor: "divider",
+				borderRadius: 1,
+				bgcolor: "#fff",
+				overflow: "hidden",
+				maxWidth: "100%",
+			}}
+		>
+			<svg ref={svgRef} />
+		</Box>
+	);
+}

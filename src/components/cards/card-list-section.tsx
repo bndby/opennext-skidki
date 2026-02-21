@@ -22,6 +22,7 @@ import Link from "next/link";
 
 import { distanceInKm } from "@/lib/sort/cards-sort";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
+import { BarcodeMiniPreview } from "./barcode-mini-preview";
 
 type CardListSectionProps = {
 	title: string;
@@ -72,9 +73,7 @@ export function CardListSection({
 								) : null}
 							</Stack>
 							<Box>
-								<Typography variant="body2" color="text.secondary">
-									Штрихкод: {card.barcodeValue}
-								</Typography>
+								<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
 							</Box>
 							<Stack direction="row" spacing={1} flexWrap="wrap">
 								<Button
