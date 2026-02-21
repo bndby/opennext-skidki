@@ -1,8 +1,5 @@
 "use client";
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { Alert, Button, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -31,27 +28,27 @@ export default function EditCardPage() {
 
 	if (notFound) {
 		return (
-			<Container maxWidth="sm" sx={{ py: 3 }}>
-				<Alert severity="error">Карточка не найдена.</Alert>
-			</Container>
+			<div className="app-container app-container--page">
+				<p className="alert alert--error">Карточка не найдена.</p>
+			</div>
 		);
 	}
 
 	if (!card) {
 		return (
-			<Container maxWidth="sm" sx={{ py: 3 }}>
-				<Typography color="text.secondary">Загрузка...</Typography>
-			</Container>
+			<div className="app-container app-container--page">
+				<p className="text-muted">Загрузка...</p>
+			</div>
 		);
 	}
 
 	return (
-		<Container maxWidth="sm" sx={{ py: 3 }}>
-			<Stack spacing={2}>
-				<Button component={Link} href="/" variant="text" startIcon={<ArrowBackIcon />} sx={{ alignSelf: "start" }}>
+		<div className="app-container app-container--page">
+			<div className="stack">
+				<Link href="/" className="btn btn--ghost btn--fit">
 					Назад
-				</Button>
-				<Typography variant="h5">Редактирование карточки</Typography>
+				</Link>
+				<h1 className="title-xl">Редактирование карточки</h1>
 				<CardForm
 					initialCard={card}
 					submitLabel="Сохранить изменения"
@@ -60,10 +57,9 @@ export default function EditCardPage() {
 						router.push("/");
 					}}
 				/>
-				<Button
-					variant="outlined"
-					color="error"
-					startIcon={<DeleteForeverIcon />}
+				<button
+					type="button"
+					className="btn btn--danger-outline"
 					onClick={async () => {
 						const isConfirmed = window.confirm("Удалить карточку?");
 						if (!isConfirmed) {
@@ -75,8 +71,8 @@ export default function EditCardPage() {
 					}}
 				>
 					Удалить карточку
-				</Button>
-			</Stack>
-		</Container>
+				</button>
+			</div>
+		</div>
 	);
 }

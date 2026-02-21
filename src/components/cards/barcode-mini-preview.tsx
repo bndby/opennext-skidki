@@ -1,6 +1,5 @@
 "use client";
 
-import { Box } from "@mui/material";
 import JsBarcode from "jsbarcode";
 import { useEffect, useMemo, useRef } from "react";
 
@@ -48,15 +47,8 @@ export function BarcodeMiniPreview({ value, format }: BarcodeMiniPreviewProps) {
 	}, [normalizedFormat, value]);
 
 	return (
-		<Box
-			sx={{
-				display: "inline-flex",
-				bgcolor: "#fff",
-				overflow: "hidden",
-				maxWidth: "100%",
-			}}
-		>
+		<div className="barcode-mini-preview">
 			<svg ref={svgRef} />
-		</Box>
+		</div>
 	);
 }

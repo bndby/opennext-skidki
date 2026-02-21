@@ -1,20 +1,19 @@
 "use client";
 
-import { Button, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 
 export default function OfflinePage() {
 	return (
-		<Container maxWidth="sm" sx={{ py: 5 }}>
-			<Stack spacing={2}>
-				<Typography variant="h5">Офлайн‑режим</Typography>
-				<Typography color="text.secondary">
+		<div className="app-container app-container--offline">
+			<div className="stack">
+				<h1 className="title-xl">Офлайн-режим</h1>
+				<p className="text-muted">
 					Интернет недоступен. Вы можете продолжить использовать сохранённые локально карточки.
-				</Typography>
-				<Button component={Link} href="/" variant="contained">
+				</p>
+				<Link href="/" className="btn btn--primary">
 					Открыть карточки
-				</Button>
-			</Stack>
-		</Container>
+				</Link>
+			</div>
+		</div>
 	);
 }

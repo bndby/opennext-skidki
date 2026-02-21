@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, Button, FormControlLabel, Stack, Switch, TextField } from "@mui/material";
 import { useMemo, useState, type FormEvent } from "react";
 
 import type { DiscountCard, UpsertDiscountCardInput } from "@/types/discount-card";
@@ -53,54 +52,62 @@ export function CardForm({ initialCard, submitLabel, onSubmit }: CardFormProps) 
 	}
 
 	return (
-		<Stack component="form" spacing={2} onSubmit={handleSubmit}>
+		<form className="stack" onSubmit={handleSubmit}>
 			<BarcodeScanner
 				onDetected={(value, format) => {
 					setBarcodeValue(value);
 					setBarcodeFormat(format || "CODE128");
 				}}
 			/>
-			<TextField
-				label="Название магазина"
-				value={storeName}
-				onChange={(event) => setStoreName(event.target.value)}
-				required
-				fullWidth
-			/>
-			<TextField
-				label="Штрихкод"
-				value={barcodeValue}
-				onChange={(event) => setBarcodeValue(event.target.value)}
-				required
-				fullWidth
-			/>
-			<TextField
-				label="Формат штрихкода"
-				value={barcodeFormat}
-				onChange={(event) => setBarcodeFormat(event.target.value)}
-				helperText="Например: EAN13, EAN8, CODE128"
-				fullWidth
-			/>
-			<TextField
-				label="Цвет карточки"
-				type="color"
-				value={color}
-				onChange={(event) => setColor(event.target.value)}
-				fullWidth
-				slotProps={{
-					inputLabel: {
-						shrink: true,
-					},
-				}}
-			/>
-			<FormControlLabel
-				control={<Switch checked={isFavorite} onChange={(_, checked) => setIsFavorite(checked)} />}
-				label="Избранная карточка"
-			/>
-			{formError ? <Alert severity="error">{formError}</Alert> : null}
-			<Button type="submit" variant="contained" disabled={!isValid || isSubmitting}>
+
+			<label className="field">
+				<span className="field__label">Название магазина</span>
+				<input
+					className="field__input"
+					value={storeName}
+					onChange={(event) => setStoreName(event.target.value)}
+					required
+					type="text"
+				/>
+			</label>
+
+			<label className="field">
+				<span className="field__label">Штрихкод</span>
+				<input
+					className="field__input"
+					value={barcodeValue}
+					onChange={(event) => setBarcodeValue(event.target.value)}
+					required
+					type="text"
+				/>
+			</label>
+
+			<label className="field">
+				<span className="field__label">Формат штрихкода</span>
+				<input
+					className="field__input"
+					value={barcodeFormat}
+					onChange={(event) => setBarcodeFormat(event.target.value)}
+					type="text"
+				/>
+				<span className="field__hint">Например: EAN13, EAN8, CODE128</span>
+			</label>
+
+			<label className="field">
+				<span className="field__label">Цвет карточки</span>
+				<input className="field__input field__input--color" type="color" value={color} onChange={(event) => setColor(event.target.value)} />
+			</label>
+
+			<label className="checkbox-row">
+				<input type="checkbox" checked={isFavorite} onChange={(event) => setIsFavorite(event.target.checked)} />
+				<span>Избранная карточка</span>
+			</label>
+
+			{formError ? <p className="alert alert--error">{formError}</p> : null}
+
+			<button type="submit" className="btn btn--primary" disabled={!isValid || isSubmitting}>
 				{submitLabel}
-			</Button>
-		</Stack>
+			</button>
+		</form>
 	);
 }

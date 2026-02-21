@@ -1,7 +1,5 @@
 "use client";
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Button, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -12,12 +10,12 @@ export default function NewCardPage() {
 	const router = useRouter();
 
 	return (
-		<Container maxWidth="sm" sx={{ py: 3 }}>
-			<Stack spacing={2}>
-				<Button component={Link} href="/" variant="text" startIcon={<ArrowBackIcon />} sx={{ alignSelf: "start" }}>
+		<div className="app-container app-container--page">
+			<div className="stack">
+				<Link href="/" className="btn btn--ghost btn--fit">
 					Назад
-				</Button>
-				<Typography variant="h5">Новая карточка</Typography>
+				</Link>
+				<h1 className="title-xl">Новая карточка</h1>
 				<CardForm
 					submitLabel="Сохранить карточку"
 					onSubmit={async (payload) => {
@@ -25,7 +23,7 @@ export default function NewCardPage() {
 						router.push("/");
 					}}
 				/>
-			</Stack>
-		</Container>
+			</div>
+		</div>
 	);
 }

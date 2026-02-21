@@ -1,15 +1,5 @@
 "use client";
 
-import AddIcon from "@mui/icons-material/Add";
-import {
-	Box,
-	Button,
-	Container,
-	Fab,
-	Paper,
-	Stack,
-	Typography,
-} from "@mui/material";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -22,7 +12,8 @@ import { CardListSection } from "./card-list-section";
 
 export function HomePage() {
 	const [cards, setCards] = useState<DiscountCard[]>([]);
-	const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== "undefined" ? navigator.onLine : false);
+	const [isOnline, setIsOnline] = useState(false);
+	const [isHydrated, setIsHydrated] = useState(false);
 	const [position, setPosition] = useState<GeoPoint | null>(null);
 	const [storeCoordsByName, setStoreCoordsByName] = useState<Record<string, GeoPoint | null>>({});
 	const [loading, setLoading] = useState(true);
@@ -42,6 +33,9 @@ export function HomePage() {
 		if (typeof window === "undefined") {
 			return;
 		}
+
+		setIsHydrated(true);
+		setIsOnline(navigator.onLine);
 
 		const onOnline = () => setIsOnline(true);
 		const onOffline = () => setIsOnline(false);
@@ -109,59 +103,26 @@ export function HomePage() {
 		return splitByFavorite(sortedCards);
 	}, [cards, isOnline, position, storeCoordsByName]);
 
-	return (
-		<Container
-			maxWidth="sm"
-			sx={{
-				pt: { xs: 1, sm: 2 },
-				pb: "calc(96px + env(safe-area-inset-bottom))",
-			}}
-		>
-			<Stack spacing={2}>
-				<Paper
-					elevation={0}
-					sx={{
-						px: 2,
-						py: 1.5,
-						borderRadius: 3,
-						bgcolor: "background.paper",
-						border: "1px solid",
-						borderColor: "divider",
-					}}
-				>
-					<Stack direction="row" justifyContent="space-between" alignItems="center">
-						<Typography variant="h5" sx={{ fontWeight: 700 }}>
-							Скидочные карты
-						</Typography>
-						<Button
-							variant="text"
-							size="small"
-							disableRipple
-							sx={{
-								color: isOnline ? "success.main" : "warning.main",
-								fontWeight: 600,
-							}}
-						>
-							{isOnline ? "Онлайн" : "Офлайн"}
-						</Button>
-					</Stack>
-				</Paper>
+	const onlineBadgeLabel = isHydrated && isOnline ? "Онлайн" : "Офлайн";
 
-				{loading ? <Typography color="text.secondary">Загрузка карточек...</Typography> : null}
+	return (
+		<div className="app-container app-container--with-fab">
+			<div className="stack">
+				<section className="panel panel--header">
+					<div className="row row--between row--center">
+						<h1 className="title-xl">Скидочные карты</h1>
+						<span className={`status-badge ${isHydrated && isOnline ? "status-badge--online" : "status-badge--offline"}`}>
+							{onlineBadgeLabel}
+						</span>
+					</div>
+				</section>
+
+				{loading ? <p className="text-muted">Загрузка карточек...</p> : null}
 
 				{!loading && cards.length === 0 ? (
-					<Box
-						sx={{
-							border: "1px dashed",
-							borderColor: "divider",
-							borderRadius: 3,
-							py: 5,
-							px: 2.5,
-							bgcolor: "background.paper",
-						}}
-					>
-						<Typography>Карточек пока нет. Добавьте первую карточку.</Typography>
-					</Box>
+					<section className="empty-state">
+						<p>Карточек пока нет. Добавьте первую карточку.</p>
+					</section>
 				) : null}
 
 				{sorted.favorites.length > 0 ? (
@@ -190,20 +151,10 @@ export function HomePage() {
 						}}
 					/>
 				) : null}
-			</Stack>
-			<Fab
-				component={Link}
-				href="/cards/new"
-				color="primary"
-				aria-label="Добавить карточку"
-				sx={{
-					position: "fixed",
-					right: 20,
-					bottom: "calc(20px + env(safe-area-inset-bottom))",
-				}}
-			>
-				<AddIcon />
-			</Fab>
-		</Container>
+			</div>
+			<Link href="/cards/new" className="fab" aria-label="Добавить карточку">
+				+
+			</Link>
+		</div>
 	);
 }

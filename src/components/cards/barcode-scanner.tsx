@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { useEffect, useRef, useState } from "react";
 
@@ -47,28 +46,17 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 	}, [isScanning, onDetected]);
 
 	return (
-		<Stack spacing={1.5}>
-			<Typography variant="subtitle1">Сканирование штрихкода</Typography>
-			{error ? <Alert severity="warning">{error}</Alert> : null}
-			<Box
-				sx={{
-					border: "1px dashed",
-					borderColor: "divider",
-					borderRadius: 2,
-					overflow: "hidden",
-					bgcolor: "black",
-					minHeight: 220,
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
+		<div className="stack">
+			<h3 className="title-md">Сканирование штрихкода</h3>
+			{error ? <p className="alert alert--warning">{error}</p> : null}
+			<div className="scanner-preview">
 				<video ref={videoRef} style={{ width: "100%", display: isScanning ? "block" : "none" }} />
-				{!isScanning ? <Typography color="white">Камера не запущена</Typography> : null}
-			</Box>
-			<Stack direction="row" spacing={1}>
-				<Button
-					variant="contained"
+				{!isScanning ? <p className="scanner-preview__label">Камера не запущена</p> : null}
+			</div>
+			<div className="row row--gap-sm">
+				<button
+					type="button"
+					className="btn btn--primary"
 					onClick={() => {
 						setError(null);
 						setIsScanning(true);
@@ -76,19 +64,19 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 					disabled={isScanning}
 				>
 					Запустить камеру
-				</Button>
+				</button>
 				{isScanning ? (
-					<Button variant="outlined" onClick={() => setIsScanning(false)}>
+					<button type="button" className="btn btn--outline" onClick={() => setIsScanning(false)}>
 						Остановить
-					</Button>
+					</button>
 				) : null}
-			</Stack>
+			</div>
 			{isScanning ? (
-				<Stack direction="row" spacing={1} alignItems="center">
-					<CircularProgress size={18} />
-					<Typography variant="body2">Наведите камеру на штрихкод</Typography>
-				</Stack>
+				<div className="row row--center row--gap-sm">
+					<span className="spinner" aria-hidden="true" />
+					<p className="text-small">Наведите камеру на штрихкод</p>
+				</div>
 			) : null}
-		</Stack>
+		</div>
 	);
 }

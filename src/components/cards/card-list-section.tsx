@@ -1,22 +1,5 @@
 "use client";
 
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditIcon from "@mui/icons-material/Edit";
-import LoyaltyIcon from "@mui/icons-material/Loyalty";
-import NearMeIcon from "@mui/icons-material/NearMe";
-import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import {
-	Box,
-	Button,
-	Card,
-	CardContent,
-	Chip,
-	IconButton,
-	Stack,
-	Typography,
-} from "@mui/material";
 import Link from "next/link";
 
 import { distanceInKm } from "@/lib/sort/cards-sort";
@@ -50,102 +33,49 @@ export function CardListSection({
 	onDelete,
 }: CardListSectionProps) {
 	return (
-		<Stack spacing={1.5}>
-			<Typography variant="h6" sx={{ fontWeight: 700, px: 0.5 }}>
-				{title}
-			</Typography>
-			{cards.length === 0 ? (
-				<Typography color="text.secondary">Нет карточек в этом разделе.</Typography>
-			) : null}
+		<section className="stack section-list">
+			<h2 className="title-lg title-lg--offset">{title}</h2>
+			{cards.length === 0 ? <p className="text-muted">Нет карточек в этом разделе.</p> : null}
 			{cards.map((card) => (
-				<Card
-					key={card.id}
-					sx={{
-						borderLeft: `10px solid ${card.color}`,
-						overflow: "hidden",
-					}}
-				>
-					<CardContent>
-						<Stack spacing={1.2}>
-							<Stack direction="row" justifyContent="space-between" alignItems="center">
-								<Stack direction="row" spacing={1} alignItems="center">
-									<LoyaltyIcon fontSize="small" />
-									<Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-										{card.storeName}
-									</Typography>
-								</Stack>
-								{card.isFavorite ? <StarIcon color="warning" fontSize="small" /> : <StarBorderIcon fontSize="small" />}
-							</Stack>
-							<Stack direction="row" spacing={1} flexWrap="wrap">
-								<Chip
-									icon={<TrendingUpIcon />}
-									label={card.usageCount}
-									size="small"
-									sx={{
-										bgcolor: isOnline ? "grey.100" : "success.light",
-										fontWeight: 600,
-									}}
-								/>
-								{showDistance && distanceLabel(card, userPosition) ? (
-									<Chip
-										icon={<NearMeIcon />}
-										label={distanceLabel(card, userPosition)}
-										size="small"
-										sx={{
-											bgcolor: isOnline ? "success.light" : "grey.100",
-											fontWeight: 600,
-										}}
-									/>
-								) : null}
-							</Stack>
-							<Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-								<Button
-									component={Link}
-									href={`/cards/${card.id}/use`}
-									variant="outlined"
-									size="small"
-									sx={{
-										justifyContent: "flex-start",
-										width: "fit-content",
-										minWidth: 0,
-										borderRadius: 2.5,
-									}}
-								>
-									<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
-								</Button>
-								<Stack direction="row" spacing={1} alignItems="center">
-									<IconButton
-										component={Link}
-										href={`/cards/${card.id}/edit`}
-										size="small"
-										aria-label="Редактировать"
-										sx={{
-											border: "1px solid",
-											borderColor: "divider",
-											borderRadius: 2.5,
-										}}
-									>
-										<EditIcon fontSize="small" />
-									</IconButton>
-									<IconButton
-										color="error"
-										size="small"
-										aria-label="Удалить"
-										sx={{
-											border: "1px solid",
-											borderColor: "error.main",
-											borderRadius: 2.5,
-										}}
-										onClick={() => onDelete(card.id)}
-									>
-										<DeleteOutlineIcon fontSize="small" />
-									</IconButton>
-								</Stack>
-							</Stack>
-						</Stack>
-					</CardContent>
-				</Card>
+				<article key={card.id} className="card-item" style={{ borderLeftColor: card.color }}>
+					<div className="stack card-item__content">
+						<div className="row row--between row--center">
+							<div className="row row--center row--gap-sm">
+								<span aria-hidden="true" className="icon-token">
+									CARD
+								</span>
+								<h3 className="title-md">{card.storeName}</h3>
+							</div>
+							<span aria-label={card.isFavorite ? "Избранная карточка" : "Обычная карточка"}>
+								{card.isFavorite ? "*" : "-"}
+							</span>
+						</div>
+
+						<div className="row row--wrap row--gap-sm">
+							<span className={`chip ${isOnline ? "chip--muted" : "chip--success"}`}>USES: {card.usageCount}</span>
+							{showDistance && distanceLabel(card, userPosition) ? (
+								<span className={`chip ${isOnline ? "chip--success" : "chip--muted"}`}>
+									DIST: {distanceLabel(card, userPosition)}
+								</span>
+							) : null}
+						</div>
+
+						<div className="row row--between row--center">
+							<Link href={`/cards/${card.id}/use`} className="btn btn--outline btn--barcode">
+								<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
+							</Link>
+							<div className="row row--center row--gap-sm">
+								<Link href={`/cards/${card.id}/edit`} className="icon-btn" aria-label="Редактировать">
+									ED
+								</Link>
+								<button type="button" className="icon-btn icon-btn--danger" aria-label="Удалить" onClick={() => onDelete(card.id)}>
+									DEL
+								</button>
+							</div>
+						</div>
+					</div>
+				</article>
 			))}
-		</Stack>
+		</section>
 	);
 }

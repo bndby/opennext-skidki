@@ -1,7 +1,5 @@
 "use client";
 
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Alert, Button, Card, CardContent, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,41 +30,37 @@ export default function UseCardPage() {
 
 	if (notFound) {
 		return (
-			<Container maxWidth="sm" sx={{ py: 3 }}>
-				<Alert severity="error">Карточка не найдена.</Alert>
-			</Container>
+			<div className="app-container app-container--page">
+				<p className="alert alert--error">Карточка не найдена.</p>
+			</div>
 		);
 	}
 
 	if (!card) {
 		return (
-			<Container maxWidth="sm" sx={{ py: 3 }}>
-				<Typography color="text.secondary">Загрузка...</Typography>
-			</Container>
+			<div className="app-container app-container--page">
+				<p className="text-muted">Загрузка...</p>
+			</div>
 		);
 	}
 
 	return (
-		<Container maxWidth="sm" sx={{ py: 3 }}>
-			<Stack spacing={2}>
-				<Button component={Link} href="/" variant="text" startIcon={<ArrowBackIcon />} sx={{ alignSelf: "start" }}>
+		<div className="app-container app-container--page">
+			<div className="stack">
+				<Link href="/" className="btn btn--ghost btn--fit">
 					Назад
-				</Button>
-				<Typography variant="h5">{card.storeName}</Typography>
-				<Card sx={{ borderLeft: `12px solid ${card.color}` }}>
-					<CardContent>
-						<Stack spacing={1.5}>
+				</Link>
+				<h1 className="title-xl">{card.storeName}</h1>
+				<article className="card-item card-item--wide" style={{ borderLeftColor: card.color }}>
+					<div className="stack">
 							<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
-							<Typography variant="body2" color="text.secondary">
-								Покажите штрихкод кассиру для сканирования.
-							</Typography>
-							<Typography variant="caption" color="text.secondary">
+							<p className="text-muted">Покажите штрихкод кассиру для сканирования.</p>
+							<p className="text-muted text-small">
 								Использовано: {card.usageCount} раз
-							</Typography>
-						</Stack>
-					</CardContent>
-				</Card>
-			</Stack>
-		</Container>
+							</p>
+					</div>
+				</article>
+			</div>
+		</div>
 	);
 }

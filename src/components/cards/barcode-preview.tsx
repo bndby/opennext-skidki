@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert, Stack, Typography } from "@mui/material";
 import JsBarcode from "jsbarcode";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -50,13 +49,11 @@ export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 	}, [normalizedFormat, value]);
 
 	return (
-		<Stack spacing={1}>
-			<Typography variant="subtitle1">Штрихкод для кассы</Typography>
+		<div className="stack stack--tight">
+			<h3 className="title-md">Штрихкод для кассы</h3>
 			<svg ref={svgRef} />
-			{error ? <Alert severity="warning">{error}</Alert> : null}
-			<Typography variant="caption" color="text.secondary">
-				Формат: {normalizedFormat}
-			</Typography>
-		</Stack>
+			{error ? <p className="alert alert--warning">{error}</p> : null}
+			<p className="text-muted text-small">Формат: {normalizedFormat}</p>
+		</div>
 	);
 }
