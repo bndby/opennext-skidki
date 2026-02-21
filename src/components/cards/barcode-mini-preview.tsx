@@ -51,9 +51,6 @@ export function BarcodeMiniPreview({ value, format }: BarcodeMiniPreviewProps) {
 		<Box
 			sx={{
 				display: "inline-flex",
-				border: "1px solid",
-				borderColor: "divider",
-				borderRadius: 1,
 				bgcolor: "#fff",
 				overflow: "hidden",
 				maxWidth: "100%",

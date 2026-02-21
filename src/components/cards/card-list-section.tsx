@@ -4,7 +4,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import NearMeIcon from "@mui/icons-material/NearMe";
-import QrCode2Icon from "@mui/icons-material/QrCode2";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -71,18 +70,19 @@ export function CardListSection({
 									<Chip icon={<NearMeIcon />} label={distanceLabel(card, userPosition)} size="small" color="primary" />
 								) : null}
 							</Stack>
-							<Box>
-								<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
-							</Box>
-							<Stack direction="row" spacing={1} flexWrap="wrap">
+							<Stack direction="row" spacing={1} alignItems="center">
 								<Button
 									component={Link}
 									href={`/cards/${card.id}/use`}
-									variant="contained"
+									variant="outlined"
 									size="small"
-									startIcon={<QrCode2Icon />}
+									sx={{
+										flexGrow: 1,
+										justifyContent: "flex-start",
+										textTransform: "none",
+									}}
 								>
-									Использовать
+									<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
 								</Button>
 								<IconButton
 									component={Link}
