@@ -79,6 +79,7 @@ export default function UseCardPage() {
 		}
 
 		let cancelled = false;
+	const storeName = card.storeName;
 
 		async function resolveNearestStore() {
 			setIsMapLoading(true);
@@ -89,7 +90,7 @@ export default function UseCardPage() {
 			if (!cancelled) {
 				setUserPosition(userPosition);
 			}
-			const coords = await geocodeStoreName(card.storeName, {
+			const coords = await geocodeStoreName(storeName, {
 				userPosition,
 				radiusKm: 5,
 			});
