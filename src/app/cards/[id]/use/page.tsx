@@ -47,17 +47,26 @@ export default function UseCardPage() {
 	return (
 		<div className="app-container app-container--page">
 			<div className="stack">
-				<Link href="/" className="btn btn--ghost btn--fit">
-					Назад
-				</Link>
-				<h1 className="title-xl">{card.storeName}</h1>
+				<div className="row row--center row--gap-sm">
+					<Link href="/" className="btn btn--ghost btn--fit" aria-label="Назад">
+						<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+							<path
+								d="M15 6L9 12L15 18"
+								stroke="currentColor"
+								strokeWidth="2.2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+					</Link>
+					<h1 className="title-xl">{card.storeName}</h1>
+					<span className="chip chip--muted" aria-label={`Использовано ${card.usageCount} раз`}>
+						{card.usageCount}
+					</span>
+				</div>
 				<article className="card-item card-item--wide" style={{ borderLeftColor: card.color }}>
 					<div className="stack">
 							<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
-							<p className="text-muted">Покажите штрихкод кассиру для сканирования.</p>
-							<p className="text-muted text-small">
-								Использовано: {card.usageCount} раз
-							</p>
 					</div>
 				</article>
 			</div>

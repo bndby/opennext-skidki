@@ -50,10 +50,11 @@ export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 
 	return (
 		<div className="stack stack--tight">
-			<h3 className="title-md">Штрихкод для кассы</h3>
-			<svg ref={svgRef} />
+			<svg ref={svgRef} style={{ display: "block", margin: "0 auto", maxWidth: "100%" }} />
 			{error ? <p className="alert alert--warning">{error}</p> : null}
-			<p className="text-muted text-small">Формат: {normalizedFormat}</p>
+			<p className="text-muted text-small" style={{ textAlign: "center" }}>
+				Формат: {normalizedFormat}
+			</p>
 		</div>
 	);
 }
