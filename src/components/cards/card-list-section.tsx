@@ -34,17 +34,29 @@ export function CardListSection({
 }: CardListSectionProps) {
 	return (
 		<section className="stack section-list">
-			<h2 className="title-lg title-lg--offset">{title}</h2>
+			{title ? <h2 className="title-lg title-lg--offset">{title}</h2> : null}
 			{cards.length === 0 ? <p className="text-muted">Нет карточек в этом разделе.</p> : null}
 			{cards.map((card) => (
 				<article key={card.id} className="card-item" style={{ borderLeftColor: card.color }}>
 					<div className="stack card-item__content">
 						<div className="row row--between row--center">
 							<div className="row row--center row--gap-sm">
-								<span aria-hidden="true" className="icon-token">
-									CARD
-								</span>
 								<h3 className="title-md">{card.storeName}</h3>
+								{showDistance && distanceLabel(card, userPosition) ? (
+									<span className={`chip ${isOnline ? "chip--success" : "chip--muted"}`}>
+										<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+											<path
+												d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"
+												stroke="currentColor"
+												strokeWidth="1.8"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+											<circle cx="12" cy="11" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+										</svg>
+										{distanceLabel(card, userPosition)}
+									</span>
+								) : null}
 							</div>
 							<span
 								className={`favorite-badge ${card.isFavorite ? "favorite-badge--active" : ""}`}
@@ -61,36 +73,6 @@ export function CardListSection({
 									/>
 								</svg>
 							</span>
-						</div>
-
-						<div className="row row--wrap row--gap-sm">
-							<span className={`chip ${isOnline ? "chip--muted" : "chip--success"}`}>
-								<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-									<path
-										d="M6 4v4m12-4v4M5 8h14a1 1 0 0 1 1 1v2H4V9a1 1 0 0 1 1-1Zm-1 5h16v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Zm4 3h3"
-										stroke="currentColor"
-										strokeWidth="1.8"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									/>
-								</svg>
-								{card.usageCount}
-							</span>
-							{showDistance && distanceLabel(card, userPosition) ? (
-								<span className={`chip ${isOnline ? "chip--success" : "chip--muted"}`}>
-									<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-										<path
-											d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"
-											stroke="currentColor"
-											strokeWidth="1.8"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-										<circle cx="12" cy="11" r="2.2" stroke="currentColor" strokeWidth="1.8" />
-									</svg>
-									{distanceLabel(card, userPosition)}
-								</span>
-							) : null}
 						</div>
 
 						<div className="row row--between row--center">

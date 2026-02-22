@@ -37,10 +37,20 @@ export function sortCards(
 	const { isOnline, userPosition } = options;
 
 	if (!isOnline || !userPosition) {
-		return [...cards].sort(byUsageThenUpdated);
+		return [...cards].sort((a, b) => {
+			if (a.isFavorite !== b.isFavorite) {
+				return a.isFavorite ? -1 : 1;
+			}
+
+			return byUsageThenUpdated(a, b);
+		});
 	}
 
 	return [...cards].sort((a, b) => {
+		if (a.isFavorite !== b.isFavorite) {
+			return a.isFavorite ? -1 : 1;
+		}
+
 		const aDistance = a.storeCoords ? distanceInKm(userPosition, a.storeCoords) : Number.POSITIVE_INFINITY;
 		const bDistance = b.storeCoords ? distanceInKm(userPosition, b.storeCoords) : Number.POSITIVE_INFINITY;
 		const aInNearbyRadius = Number.isFinite(aDistance) && aDistance <= NEARBY_RADIUS_KM;
