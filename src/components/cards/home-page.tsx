@@ -60,7 +60,7 @@ export function HomePage() {
 	}, [isOnline]);
 
 	useEffect(() => {
-		if (!isOnline || cards.length === 0) {
+		if (!isOnline || !position || cards.length === 0) {
 			setStoreCoordsByName({});
 			return;
 		}
@@ -70,7 +70,16 @@ export function HomePage() {
 		async function resolveStoreCoords() {
 			const uniqueStoreNames = [...new Set(cards.map((card) => card.storeName.trim()).filter(Boolean))];
 			const resolvedEntries = await Promise.all(
-				uniqueStoreNames.map(async (storeName) => [storeName, await geocodeStoreName(storeName)] as const),
+				uniqueStoreNames.map(
+					async (storeName) =>
+						[
+							storeName,
+							await geocodeStoreName(storeName, {
+								userPosition: position,
+								radiusKm: 3,
+							}),
+						] as const,
+				),
 			);
 
 			if (!cancelled) {
@@ -87,7 +96,7 @@ export function HomePage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [cards, isOnline]);
+	}, [cards, isOnline, position]);
 
 	const sorted = useMemo(() => {
 		const cardsWithRuntimeCoords = cards.map((card) => ({

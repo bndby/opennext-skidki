@@ -1,5 +1,7 @@
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 
+const NEARBY_RADIUS_KM = 3;
+
 function toRad(value: number) {
 	return (value * Math.PI) / 180;
 }
@@ -41,8 +43,14 @@ export function sortCards(
 	return [...cards].sort((a, b) => {
 		const aDistance = a.storeCoords ? distanceInKm(userPosition, a.storeCoords) : Number.POSITIVE_INFINITY;
 		const bDistance = b.storeCoords ? distanceInKm(userPosition, b.storeCoords) : Number.POSITIVE_INFINITY;
+		const aInNearbyRadius = Number.isFinite(aDistance) && aDistance <= NEARBY_RADIUS_KM;
+		const bInNearbyRadius = Number.isFinite(bDistance) && bDistance <= NEARBY_RADIUS_KM;
 
-		if (aDistance !== bDistance) {
+		if (aInNearbyRadius !== bInNearbyRadius) {
+			return aInNearbyRadius ? -1 : 1;
+		}
+
+		if (aInNearbyRadius && bInNearbyRadius && aDistance !== bDistance) {
 			return aDistance - bDistance;
 		}
 
