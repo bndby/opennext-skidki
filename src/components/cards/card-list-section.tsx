@@ -46,16 +46,49 @@ export function CardListSection({
 								</span>
 								<h3 className="title-md">{card.storeName}</h3>
 							</div>
-							<span aria-label={card.isFavorite ? "Избранная карточка" : "Обычная карточка"}>
-								{card.isFavorite ? "*" : "-"}
+							<span
+								className={`favorite-badge ${card.isFavorite ? "favorite-badge--active" : ""}`}
+								aria-label={card.isFavorite ? "Избранная карточка" : "Обычная карточка"}
+							>
+								<svg className="favorite-badge__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path
+										d="m12 3 2.8 5.7 6.2.9-4.5 4.3 1.1 6.1L12 17.1 6.4 20l1.1-6.1L3 9.6l6.2-.9L12 3Z"
+										stroke="currentColor"
+										strokeWidth="1.8"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										fill={card.isFavorite ? "currentColor" : "none"}
+									/>
+								</svg>
 							</span>
 						</div>
 
 						<div className="row row--wrap row--gap-sm">
-							<span className={`chip ${isOnline ? "chip--muted" : "chip--success"}`}>USES: {card.usageCount}</span>
+							<span className={`chip ${isOnline ? "chip--muted" : "chip--success"}`}>
+								<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path
+										d="M6 4v4m12-4v4M5 8h14a1 1 0 0 1 1 1v2H4V9a1 1 0 0 1 1-1Zm-1 5h16v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Zm4 3h3"
+										stroke="currentColor"
+										strokeWidth="1.8"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+								{card.usageCount}
+							</span>
 							{showDistance && distanceLabel(card, userPosition) ? (
 								<span className={`chip ${isOnline ? "chip--success" : "chip--muted"}`}>
-									DIST: {distanceLabel(card, userPosition)}
+									<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+										<path
+											d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"
+											stroke="currentColor"
+											strokeWidth="1.8"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+										<circle cx="12" cy="11" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+									</svg>
+									{distanceLabel(card, userPosition)}
 								</span>
 							) : null}
 						</div>
@@ -66,10 +99,27 @@ export function CardListSection({
 							</Link>
 							<div className="row row--center row--gap-sm">
 								<Link href={`/cards/${card.id}/edit`} className="icon-btn" aria-label="Редактировать">
-									ED
+									<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+										<path
+											d="M4 20h4l10.5-10.5a1.4 1.4 0 0 0 0-2L16.5 5a1.4 1.4 0 0 0-2 0L4 15.5V20Z"
+											stroke="currentColor"
+											strokeWidth="1.8"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+										<path d="m13.5 6 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+									</svg>
 								</Link>
 								<button type="button" className="icon-btn icon-btn--danger" aria-label="Удалить" onClick={() => onDelete(card.id)}>
-									DEL
+									<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+										<path
+											d="M4 7h16M9 7V5h6v2m-8 0 1 12h8l1-12M10 11v5m4-5v5"
+											stroke="currentColor"
+											strokeWidth="1.8"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
 								</button>
 							</div>
 						</div>

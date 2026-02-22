@@ -61,6 +61,30 @@ a {
 	padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
+.fab {
+	position: fixed;
+	right: 20px;
+	bottom: calc(20px + env(safe-area-inset-bottom));
+	width: 56px;
+	height: 56px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 999px;
+	background: var(--primary);
+	color: #fff;
+	box-shadow: 0 10px 24px rgba(21, 72, 145, 0.35);
+}
+
+.fab:hover {
+	background: var(--primary-hover);
+}
+
+.fab__icon {
+	width: 22px;
+	height: 22px;
+}
+
 .app-container--page {
 	padding-top: 20px;
 	padding-bottom: 20px;
@@ -240,10 +264,17 @@ a {
 .chip {
 	display: inline-flex;
 	align-items: center;
+	gap: 6px;
 	padding: 4px 10px;
 	border-radius: 999px;
 	font-size: 0.82rem;
 	font-weight: 600;
+}
+
+.chip__icon {
+	width: 14px;
+	height: 14px;
+	flex: 0 0 auto;
 }
 
 .chip--muted {
@@ -263,6 +294,24 @@ a {
 	color: #5e6f89;
 }
 
+.favorite-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: #93a1b8;
+}
+
+.favorite-badge--active {
+	color: #d49b11;
+}
+
+.favorite-badge__icon {
+	width: 18px;
+	height: 18px;
+}
+
 .icon-btn {
 	display: inline-flex;
 	align-items: center;
@@ -277,6 +326,11 @@ a {
 	font-size: 0.82rem;
 	font-weight: 700;
 	cursor: pointer;
+}
+
+.icon-btn__svg {
+	width: 18px;
+	height: 18px;
 }
 
 .icon-btn--danger {
