@@ -39,17 +39,12 @@ export async function geocodeStoreName(
 		return null;
 	}
 
-	const url = new URL("https://nominatim.openstreetmap.org/search");
+	const url = new URL("/api/geocode", window.location.origin);
 	url.searchParams.set("q", query);
-	url.searchParams.set("format", "jsonv2");
 	url.searchParams.set("limit", "8");
 
 	try {
-		const response = await fetch(url.toString(), {
-			headers: {
-				Accept: "application/json",
-			},
-		});
+		const response = await fetch(url.toString(), { cache: "no-store" });
 
 		if (!response.ok) {
 			return null;
