@@ -5,13 +5,54 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { BarcodePreview } from "@/components/cards/barcode-preview";
+import { StoreRouteMap } from "@/components/cards/store-route-map";
+import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
+import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
 import { getCardById, incrementCardUsage } from "@/lib/storage/cards-repository";
-import type { DiscountCard } from "@/types/discount-card";
+import type { DiscountCard, GeoPoint } from "@/types/discount-card";
+
+type OsrmRouteResponse = {
+	routes?: Array<{
+		duration: number;
+		geometry: {
+			coordinates: [number, number][];
+		};
+	}>;
+};
+
+async function getWalkingRoute(from: GeoPoint, to: GeoPoint) {
+	const routeUrl = new URL(
+		`https://router.project-osrm.org/route/v1/foot/${from.lon},${from.lat};${to.lon},${to.lat}`,
+	);
+	routeUrl.searchParams.set("overview", "full");
+	routeUrl.searchParams.set("geometries", "geojson");
+
+	const response = await fetch(routeUrl.toString());
+	if (!response.ok) {
+		return null;
+	}
+
+	const payload = (await response.json()) as OsrmRouteResponse;
+	const firstRoute = payload.routes?.[0];
+	if (!firstRoute) {
+		return null;
+	}
+
+	return {
+		durationSec: firstRoute.duration,
+		path: firstRoute.geometry.coordinates.map(([lon, lat]) => ({ lat, lon })),
+	};
+}
 
 export default function UseCardPage() {
 	const params = useParams<{ id: string }>();
 	const [card, setCard] = useState<DiscountCard | null>(null);
 	const [notFound, setNotFound] = useState(false);
+	const [nearestStoreCoords, setNearestStoreCoords] = useState<GeoPoint | null>(null);
+	const [isMapLoading, setIsMapLoading] = useState(false);
+	const [userPosition, setUserPosition] = useState<GeoPoint | null>(null);
+	const [routePath, setRoutePath] = useState<GeoPoint[]>([]);
+	const [routeDurationSec, setRouteDurationSec] = useState<number | null>(null);
 
 	useEffect(() => {
 		incrementCardUsage(params.id)
@@ -27,6 +68,64 @@ export default function UseCardPage() {
 				setCard(fallback);
 			});
 	}, [params.id]);
+
+	useEffect(() => {
+		if (!card) {
+			setNearestStoreCoords(null);
+			setUserPosition(null);
+			setRoutePath([]);
+			setRouteDurationSec(null);
+			return;
+		}
+
+		let cancelled = false;
+
+		async function resolveNearestStore() {
+			setIsMapLoading(true);
+			setRoutePath([]);
+			setRouteDurationSec(null);
+
+			const userPosition = await getCurrentPosition();
+			if (!cancelled) {
+				setUserPosition(userPosition);
+			}
+			const coords = await geocodeStoreName(card.storeName, {
+				userPosition,
+				radiusKm: 5,
+			});
+
+			let walkingRoute: { durationSec: number; path: GeoPoint[] } | null = null;
+			if (userPosition && coords) {
+				walkingRoute = await getWalkingRoute(userPosition, coords).catch(() => null);
+			}
+
+			if (!cancelled) {
+				setNearestStoreCoords(coords);
+				setRoutePath(walkingRoute?.path ?? []);
+				setRouteDurationSec(walkingRoute?.durationSec ?? null);
+				setIsMapLoading(false);
+			}
+		}
+
+		resolveNearestStore().catch(() => {
+			if (!cancelled) {
+				setNearestStoreCoords(null);
+				setUserPosition(null);
+				setRoutePath([]);
+				setRouteDurationSec(null);
+				setIsMapLoading(false);
+			}
+		});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [card]);
+
+	const routeDurationLabel =
+		routeDurationSec && Number.isFinite(routeDurationSec)
+			? `${Math.max(1, Math.round(routeDurationSec / 60))} мин`
+			: null;
 
 	if (notFound) {
 		return (
@@ -66,7 +165,29 @@ export default function UseCardPage() {
 				</div>
 				<article className="card-item card-item--wide" style={{ borderLeftColor: card.color }}>
 					<div className="stack">
-							<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
+						<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
+						<section className="store-map-block">
+							<h2 className="title-md">Ближайший магазин</h2>
+							{isMapLoading ? <p className="text-muted text-small">Определяем ближайший магазин...</p> : null}
+							{!isMapLoading && nearestStoreCoords && userPosition ? (
+								<>
+									<StoreRouteMap
+										userPosition={userPosition}
+										storePosition={nearestStoreCoords}
+										routePath={routePath}
+										storeName={card.storeName}
+									/>
+									<p className="text-muted text-small">
+										{routeDurationLabel
+											? `Пеший маршрут: ${routeDurationLabel}`
+											: "Пеший маршрут пока не удалось построить."}
+									</p>
+								</>
+							) : null}
+							{!isMapLoading && (!nearestStoreCoords || !userPosition) ? (
+								<p className="text-muted text-small">Не удалось определить вашу позицию или ближайший магазин.</p>
+							) : null}
+						</section>
 					</div>
 				</article>
 			</div>

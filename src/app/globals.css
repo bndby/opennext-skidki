@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
 	--background: #eef2f8;
@@ -352,6 +353,29 @@ a {
 .scanner-preview__label {
 	color: #fff;
 	margin: 0;
+}
+
+.store-map-block {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding-top: 4px;
+}
+
+.store-map-block__frame {
+	width: 100%;
+	height: 240px;
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	background: #f4f7fb;
+	position: relative;
+}
+
+.store-map-block__frame.leaflet-container img,
+.leaflet-container .leaflet-tile,
+.leaflet-container .leaflet-marker-icon,
+.leaflet-container .leaflet-marker-shadow {
+	max-width: none !important;
 }
 
 .spinner {
