@@ -38,7 +38,7 @@ export function BarcodeMiniPreview({ value, format }: BarcodeMiniPreviewProps) {
 				lineColor: "#000000",
 				background: "#ffffff",
 				height: 32,
-				margin: 6,
+				margin: 2,
 				width: 1.2,
 			});
 		} catch {

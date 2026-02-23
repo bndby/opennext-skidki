@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
 import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
 import { sortCards } from "@/lib/sort/cards-sort";
-import { listCards, removeCard } from "@/lib/storage/cards-repository";
+import { listCards } from "@/lib/storage/cards-repository";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 import { CardListSection } from "./card-list-section";
 
@@ -126,10 +126,6 @@ export function HomePage() {
 						userPosition={position}
 						showDistance={isOnline}
 						isOnline={isOnline}
-						onDelete={async (id) => {
-							await removeCard(id);
-							await loadCards();
-						}}
 					/>
 				) : null}
 			</div>

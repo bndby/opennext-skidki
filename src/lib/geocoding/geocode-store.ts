@@ -38,10 +38,16 @@ export async function geocodeStoreName(
 	if (!query) {
 		return null;
 	}
+	if (!userPosition) {
+		return null;
+	}
 
 	const url = new URL("/api/geocode", window.location.origin);
 	url.searchParams.set("q", query);
 	url.searchParams.set("limit", "8");
+	url.searchParams.set("lat", String(userPosition.lat));
+	url.searchParams.set("lon", String(userPosition.lon));
+	url.searchParams.set("radiusKm", String(radiusKm));
 
 	try {
 		const response = await fetch(url.toString(), { cache: "no-store" });
@@ -60,10 +66,6 @@ export async function geocodeStoreName(
 
 		if (candidates.length === 0) {
 			return null;
-		}
-
-		if (!userPosition) {
-			return candidates[0];
 		}
 
 		const nearestInRadius = candidates

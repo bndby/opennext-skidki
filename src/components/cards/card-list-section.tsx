@@ -12,7 +12,6 @@ type CardListSectionProps = {
 	userPosition: GeoPoint | null;
 	showDistance: boolean;
 	isOnline: boolean;
-	onDelete: (id: string) => Promise<void>;
 };
 
 function distanceLabel(card: DiscountCard, userPosition: GeoPoint | null) {
@@ -30,14 +29,18 @@ export function CardListSection({
 	userPosition,
 	showDistance,
 	isOnline,
-	onDelete,
 }: CardListSectionProps) {
 	return (
 		<section className="stack section-list">
 			{title ? <h2 className="title-lg title-lg--offset">{title}</h2> : null}
 			{cards.length === 0 ? <p className="text-muted">Нет карточек в этом разделе.</p> : null}
 			{cards.map((card) => (
-				<article key={card.id} className="card-item" style={{ borderLeftColor: card.color }}>
+				<Link
+					key={card.id}
+					href={`/cards/${card.id}/use`}
+					className="card-item card-item--link"
+					style={{ borderLeftColor: card.color }}
+				>
 					<div className="stack card-item__content">
 						<div className="row row--between row--center">
 							<div className="row row--center row--gap-sm">
@@ -76,37 +79,12 @@ export function CardListSection({
 						</div>
 
 						<div className="row row--between row--center">
-							<Link href={`/cards/${card.id}/use`} className="btn btn--outline btn--barcode">
+							<div className="btn btn--barcode">
 								<BarcodeMiniPreview value={card.barcodeValue} format={card.barcodeFormat} />
-							</Link>
-							<div className="row row--center row--gap-sm">
-								<Link href={`/cards/${card.id}/edit`} className="icon-btn" aria-label="Редактировать">
-									<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-										<path
-											d="M4 20h4l10.5-10.5a1.4 1.4 0 0 0 0-2L16.5 5a1.4 1.4 0 0 0-2 0L4 15.5V20Z"
-											stroke="currentColor"
-											strokeWidth="1.8"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-										<path d="m13.5 6 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-									</svg>
-								</Link>
-								<button type="button" className="icon-btn icon-btn--danger" aria-label="Удалить" onClick={() => onDelete(card.id)}>
-									<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-										<path
-											d="M4 7h16M9 7V5h6v2m-8 0 1 12h8l1-12M10 11v5m4-5v5"
-											stroke="currentColor"
-											strokeWidth="1.8"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								</button>
 							</div>
 						</div>
 					</div>
-				</article>
+				</Link>
 			))}
 		</section>
 	);
