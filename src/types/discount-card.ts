@@ -1,3 +1,5 @@
+import type { StoreBrandKey } from "@/lib/store-logos";
+
 export type GeoPoint = {
 	lat: number;
 	lon: number;
@@ -6,6 +8,8 @@ export type GeoPoint = {
 export type DiscountCard = {
 	id: string;
 	storeName: string;
+	storeBrandKey: StoreBrandKey;
+	storeLogoDataUrl?: string | null;
 	barcodeValue: string;
 	barcodeFormat: string;
 	color: string;
@@ -19,6 +23,8 @@ export type DiscountCard = {
 
 export type UpsertDiscountCardInput = {
 	storeName: string;
+	storeBrandKey?: StoreBrandKey;
+	storeLogoDataUrl?: string | null;
 	barcodeValue: string;
 	barcodeFormat: string;
 	color: string;

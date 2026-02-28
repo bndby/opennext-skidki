@@ -52,6 +52,7 @@ export default function EditCardPage() {
 				<CardForm
 					initialCard={card}
 					submitLabel="Сохранить изменения"
+					enableBrandPresetPicker
 					onSubmit={async (payload) => {
 						await updateCard(card.id, payload);
 						router.push("/");

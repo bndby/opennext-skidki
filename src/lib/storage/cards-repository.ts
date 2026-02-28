@@ -1,18 +1,29 @@
 import { CARDS_STORE, getDb } from "@/lib/storage/db";
+import { normalizeStoreBrandKey } from "@/lib/store-logos";
 import type { DiscountCard, UpsertDiscountCardInput } from "@/types/discount-card";
 
 function nowIso() {
 	return new Date().toISOString();
 }
 
+function normalizeCard(card: DiscountCard): DiscountCard {
+	return {
+		...card,
+		storeBrandKey: normalizeStoreBrandKey(card.storeBrandKey, card.storeName),
+		storeLogoDataUrl: card.storeLogoDataUrl ?? null,
+	};
+}
+
 export async function listCards() {
 	const db = await getDb();
-	return db.getAll(CARDS_STORE);
+	const cards = await db.getAll(CARDS_STORE);
+	return cards.map(normalizeCard);
 }
 
 export async function getCardById(id: string) {
 	const db = await getDb();
-	return db.get(CARDS_STORE, id);
+	const card = await db.get(CARDS_STORE, id);
+	return card ? normalizeCard(card) : null;
 }
 
 export async function createCard(input: UpsertDiscountCardInput) {
@@ -22,6 +33,8 @@ export async function createCard(input: UpsertDiscountCardInput) {
 	const card: DiscountCard = {
 		id: crypto.randomUUID(),
 		storeName: input.storeName.trim(),
+		storeBrandKey: normalizeStoreBrandKey(input.storeBrandKey, input.storeName),
+		storeLogoDataUrl: input.storeLogoDataUrl ?? null,
 		barcodeValue: input.barcodeValue.trim(),
 		barcodeFormat: input.barcodeFormat.trim() || "CODE128",
 		color: input.color,
@@ -48,6 +61,8 @@ export async function updateCard(id: string, input: UpsertDiscountCardInput) {
 	const updated: DiscountCard = {
 		...existing,
 		storeName: input.storeName.trim(),
+		storeBrandKey: normalizeStoreBrandKey(input.storeBrandKey, input.storeName),
+		storeLogoDataUrl: input.storeLogoDataUrl ?? existing.storeLogoDataUrl ?? null,
 		barcodeValue: input.barcodeValue.trim(),
 		barcodeFormat: input.barcodeFormat.trim() || existing.barcodeFormat || "CODE128",
 		color: input.color,

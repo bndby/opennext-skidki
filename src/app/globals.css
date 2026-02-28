@@ -245,6 +245,60 @@ a {
 	border-color: #ef9fad;
 }
 
+.card-menu-list {
+	background: var(--surface);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+}
+
+.card-menu-item {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.card-menu-item + .card-menu-item {
+	border-top: 1px solid #e2e7f0;
+}
+
+.card-menu-item__content {
+	padding: 14px;
+	gap: 12px;
+}
+
+.store-logo {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 8px;
+	background: #eef2f8;
+	border: 1px solid #dbe3ef;
+	overflow: hidden;
+	flex: 0 0 auto;
+}
+
+.store-logo__img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+}
+
+.store-logo__fallback {
+	font-size: 0.8rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	color: #4d5c74;
+	text-transform: uppercase;
+}
+
+.card-menu-item:hover {
+	background: #f8fafe;
+}
+
 .card-item {
 	background: var(--surface);
 	border: 1px solid var(--surface-border);
