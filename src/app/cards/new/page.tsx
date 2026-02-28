@@ -18,6 +18,7 @@ export default function NewCardPage() {
 				<h1 className="title-xl">Новая карточка</h1>
 				<CardForm
 					submitLabel="Сохранить карточку"
+					enableBrandPresetPicker
 					onSubmit={async (payload) => {
 						await createCard(payload);
 						router.push("/");

@@ -1,4 +1,4 @@
-export const STORE_BRAND_KEYS = ["custom", "varka", "gippo", "sosedi", "evroopt", "green"] as const;
+export const STORE_BRAND_KEYS = ["custom", "varka", "gippo", "sosedi", "evroopt", "green", "prostore", "korona"] as const;
 
 export type StoreBrandKey = (typeof STORE_BRAND_KEYS)[number];
 
@@ -59,6 +59,22 @@ const STORE_BRAND_CONFIGS: StoreBrandConfig[] = [
 		defaultStoreName: "Green",
 		defaultCardColor: "#0da018",
 		match: [/\bgreen\b/i, /\bгрин\b/i],
+	},
+	{
+		key: "prostore",
+		label: "ProStore",
+		logoSrc: "/store-logos/prostore.png",
+		defaultStoreName: "ProStore",
+		defaultCardColor: "#042d95",
+		match: [/\bpro\s?store\b/i, /\bпростор\b/i],
+	},
+	{
+		key: "korona",
+		label: "Корона",
+		logoSrc: "/store-logos/korona.svg",
+		defaultStoreName: "Корона",
+		defaultCardColor: "#f9683a",
+		match: [/\bкорона\b/i, /\bkorona\b/i],
 	},
 ];
 
