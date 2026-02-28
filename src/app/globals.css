@@ -256,6 +256,7 @@ a {
 	display: block;
 	color: inherit;
 	text-decoration: none;
+	transition: filter 0.15s ease;
 }
 
 .card-menu-item + .card-menu-item {
@@ -267,17 +268,30 @@ a {
 	gap: 12px;
 }
 
+.card-menu-item__store-name {
+	text-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.9),
+		0 -1px 0 rgba(255, 255, 255, 0.9),
+		1px 0 0 rgba(255, 255, 255, 0.9),
+		-1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
 .store-logo {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
+	width: 44px;
+	height: 44px;
 	border-radius: 8px;
 	background: #eef2f8;
 	border: 1px solid #dbe3ef;
 	overflow: hidden;
 	flex: 0 0 auto;
+}
+
+.store-logo--plain {
+	background: transparent;
+	border: none;
 }
 
 .store-logo__img {
@@ -296,7 +310,7 @@ a {
 }
 
 .card-menu-item:hover {
-	background: #f8fafe;
+	filter: brightness(0.98);
 }
 
 .card-item {
@@ -352,13 +366,21 @@ a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
-	color: #93a1b8;
+	width: 28px;
+	height: 28px;
+	border-radius: 999px;
+	color: #596983;
+	background: rgba(255, 255, 255, 0.88);
+	border: 1px solid rgba(77, 92, 116, 0.32);
+	box-shadow:
+		0 1px 2px rgba(15, 23, 42, 0.2),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.55);
 }
 
 .favorite-badge--active {
-	color: #d49b11;
+	color: #b88000;
+	border-color: rgba(184, 128, 0, 0.45);
+	background: rgba(255, 250, 237, 0.95);
 }
 
 .favorite-badge__icon {

@@ -23,6 +23,28 @@ function distanceLabel(card: DiscountCard, userPosition: GeoPoint | null) {
 	return `${km.toFixed(1)} км`;
 }
 
+function hexToRgba(hex: string, alpha: number) {
+	const normalizedHex = hex.replace("#", "").trim();
+	if (!/^[\da-fA-F]{3}$|^[\da-fA-F]{6}$/.test(normalizedHex)) {
+		return `rgba(25, 118, 210, ${alpha})`;
+	}
+
+	const fullHex =
+		normalizedHex.length === 3
+			? normalizedHex
+					.split("")
+					.map((part) => part + part)
+					.join("")
+			: normalizedHex;
+
+	const intValue = Number.parseInt(fullHex, 16);
+	const red = (intValue >> 16) & 255;
+	const green = (intValue >> 8) & 255;
+	const blue = intValue & 255;
+
+	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
 export function CardListSection({
 	title,
 	cards,
@@ -41,18 +63,25 @@ export function CardListSection({
 						const logoSrc = card.storeLogoDataUrl ?? storeLogo.src;
 
 						return (
-							<Link key={card.id} href={`/cards/${card.id}/use`} className="card-menu-item">
+							<Link
+								key={card.id}
+								href={`/cards/${card.id}/use`}
+								className="card-menu-item"
+								style={{
+									backgroundImage: `linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, ${hexToRgba(card.color, 0.48)} 100%)`,
+								}}
+							>
 								<div className="stack card-menu-item__content">
 									<div className="row row--between row--center">
 										<div className="row row--center row--gap-sm row--wrap">
-											<span className="store-logo" aria-hidden="true">
+											<span className={`store-logo ${logoSrc ? "store-logo--plain" : ""}`} aria-hidden="true">
 												{logoSrc ? (
 													<img src={logoSrc} alt="" className="store-logo__img" loading="lazy" />
 												) : (
 													<span className="store-logo__fallback">{storeLogo.initials}</span>
 												)}
 											</span>
-											<h3 className="title-md">{card.storeName}</h3>
+											<h3 className="title-md card-menu-item__store-name">{card.storeName}</h3>
 											{showDistance && distanceLabel(card, userPosition) ? (
 												<span className={`chip ${isOnline ? "chip--success" : "chip--muted"}`}>
 													<svg className="chip__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
