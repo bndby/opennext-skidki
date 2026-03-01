@@ -81,7 +81,8 @@ export default function UseCardPage() {
 		}
 
 		let cancelled = false;
-	const storeName = card.storeName;
+		const storeName = card.storeName;
+		const fallbackStoreCoords = card.storeCoords;
 
 		async function resolveNearestStore() {
 			setIsMapLoading(true);
@@ -92,10 +93,11 @@ export default function UseCardPage() {
 			if (!cancelled) {
 				setUserPosition(userPosition);
 			}
-			const coords = await geocodeStoreName(storeName, {
+			const geocodedCoords = await geocodeStoreName(storeName, {
 				userPosition,
 				radiusKm: 3,
 			});
+			const coords = geocodedCoords ?? fallbackStoreCoords ?? null;
 
 			let walkingRoute: { durationSec: number; path: GeoPoint[] } | null = null;
 			if (userPosition && coords) {

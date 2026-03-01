@@ -96,7 +96,7 @@ export function CardListSection({
 									<h3 className="title-md card-menu-item__store-name">{card.storeName}</h3>
 								</div>
 								{distance ? (
-									<span className={`card-menu-item__distance ${isOnline ? "card-menu-item__distance--online" : ""}`}>
+									<div className={`card-menu-item__distance-block ${isOnline ? "card-menu-item__distance-block--online" : ""}`}>
 										<svg className="card-menu-item__distance-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 											<path
 												d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"
@@ -107,8 +107,8 @@ export function CardListSection({
 											/>
 											<circle cx="12" cy="11" r="2.2" stroke="currentColor" strokeWidth="1.8" />
 										</svg>
-										{distance}
-									</span>
+										<div className="card-menu-item__distance-text">{distance}</div>
+									</div>
 								) : null}
 							</Link>
 						);

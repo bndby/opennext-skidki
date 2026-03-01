@@ -14,6 +14,8 @@ export function HomePage() {
 	const [cards, setCards] = useState<DiscountCard[]>([]);
 	const [isOnline, setIsOnline] = useState(false);
 	const [position, setPosition] = useState<GeoPoint | null>(null);
+	const [isLocating, setIsLocating] = useState(false);
+	const [isResolvingNearestStores, setIsResolvingNearestStores] = useState(false);
 	const [storeCoordsByName, setStoreCoordsByName] = useState<Record<string, GeoPoint | null>>({});
 	const [loading, setLoading] = useState(true);
 
@@ -50,16 +52,23 @@ export function HomePage() {
 	useEffect(() => {
 		if (!isOnline) {
 			setPosition(null);
+			setIsLocating(false);
 			setStoreCoordsByName({});
 			return;
 		}
 
-		const unsubscribe = subscribeToPositionChanges(setPosition, {
+		setIsLocating(true);
+
+		const unsubscribe = subscribeToPositionChanges((nextPosition) => {
+			setPosition(nextPosition);
+			setIsLocating(false);
+		}, {
 			maximumAgeMs: 15_000,
 		});
 
 		if (!unsubscribe) {
 			setPosition(null);
+			setIsLocating(false);
 			return;
 		}
 
@@ -70,6 +79,7 @@ export function HomePage() {
 
 	useEffect(() => {
 		if (!isOnline || !position || cards.length === 0) {
+			setIsResolvingNearestStores(false);
 			setStoreCoordsByName({});
 			return;
 		}
@@ -77,27 +87,43 @@ export function HomePage() {
 		let cancelled = false;
 
 		async function resolveStoreCoords() {
-			const uniqueStoreNames = [...new Set(cards.map((card) => card.storeName.trim()).filter(Boolean))];
+			setIsResolvingNearestStores(true);
+			const fallbackCoordsByStoreName = new Map<string, GeoPoint | null>();
+			for (const card of cards) {
+				const storeName = card.storeName.trim();
+				if (!storeName || fallbackCoordsByStoreName.has(storeName)) {
+					continue;
+				}
+				fallbackCoordsByStoreName.set(storeName, card.storeCoords ?? null);
+			}
+
+			const uniqueStoreNames = [...fallbackCoordsByStoreName.keys()];
 			const resolvedEntries = await Promise.all(
 				uniqueStoreNames.map(
-					async (storeName) =>
-						[
-							storeName,
-							await geocodeStoreName(storeName, {
-								userPosition: position,
-								radiusKm: 3,
-							}),
-						] as const,
+					async (storeName) => {
+						const fallbackCoords = fallbackCoordsByStoreName.get(storeName) ?? null;
+						if (fallbackCoords) {
+							return [storeName, fallbackCoords] as const;
+						}
+
+						const geocodedCoords = await geocodeStoreName(storeName, {
+							userPosition: position,
+							radiusKm: 3,
+						});
+						return [storeName, geocodedCoords ?? fallbackCoords] as const;
+					},
 				),
 			);
 
 			if (!cancelled) {
 				setStoreCoordsByName(Object.fromEntries(resolvedEntries));
+				setIsResolvingNearestStores(false);
 			}
 		}
 
 		resolveStoreCoords().catch(() => {
 			if (!cancelled) {
+				setIsResolvingNearestStores(false);
 				setStoreCoordsByName({});
 			}
 		});
@@ -110,7 +136,7 @@ export function HomePage() {
 	const sortedCards = useMemo(() => {
 		const cardsWithRuntimeCoords = cards.map((card) => ({
 			...card,
-			storeCoords: isOnline ? storeCoordsByName[card.storeName.trim()] ?? null : null,
+			storeCoords: isOnline ? storeCoordsByName[card.storeName.trim()] ?? card.storeCoords ?? null : null,
 		}));
 
 		return sortCards(cardsWithRuntimeCoords, {
@@ -123,6 +149,18 @@ export function HomePage() {
 		<div className="app-container app-container--with-fab">
 			<div className="stack">
 				{loading ? <p className="text-muted">Загрузка карточек...</p> : null}
+				{!loading && isOnline && isLocating ? (
+					<div className="row row--center row--gap-sm" role="status" aria-live="polite">
+						<span className="spinner" aria-hidden="true" />
+						<p className="text-muted text-small">Определяем ваше местоположение...</p>
+					</div>
+				) : null}
+				{!loading && isOnline && !isLocating && isResolvingNearestStores ? (
+					<div className="row row--center row--gap-sm" role="status" aria-live="polite">
+						<span className="spinner" aria-hidden="true" />
+						<p className="text-muted text-small">Ищем ближайшие магазины...</p>
+					</div>
+				) : null}
 
 				{!loading && cards.length === 0 ? (
 					<section className="empty-state">

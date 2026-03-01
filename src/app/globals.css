@@ -375,7 +375,7 @@ a {
 
 .card-menu-item__store-name {
 	margin: 0;
-	font-size: 0.84rem;
+	font-size: 1rem;
 	line-height: 1.2;
 	max-width: 100%;
 	overflow: hidden;
@@ -405,9 +405,9 @@ a {
 	z-index: 2;
 }
 
-.card-menu-item__distance {
+.card-menu-item__distance-block {
 	position: absolute;
-	left: 8px;
+	right: 8px;
 	bottom: 8px;
 	z-index: 2;
 	display: inline-flex;
@@ -422,8 +422,14 @@ a {
 	white-space: nowrap;
 }
 
-.card-menu-item__distance--online {
+.card-menu-item__distance-block--online {
 	color: var(--success-fg);
+}
+
+.card-menu-item__distance-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .card-menu-item__distance-icon {

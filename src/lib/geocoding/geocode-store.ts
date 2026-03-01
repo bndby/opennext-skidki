@@ -5,6 +5,8 @@ type NominatimResult = {
 	lon: string;
 };
 
+const geocodeCache = new Map<string, GeoPoint>();
+
 function toRad(value: number) {
 	return (value * Math.PI) / 180;
 }
@@ -42,6 +44,14 @@ export async function geocodeStoreName(
 		return null;
 	}
 
+	const roundedLat = userPosition.lat.toFixed(3);
+	const roundedLon = userPosition.lon.toFixed(3);
+	const cacheKey = `${query.toLowerCase()}|${roundedLat}|${roundedLon}|${radiusKm}`;
+	const cached = geocodeCache.get(cacheKey);
+	if (cached) {
+		return cached;
+	}
+
 	const url = new URL("/api/geocode", window.location.origin);
 	url.searchParams.set("q", query);
 	url.searchParams.set("limit", "8");
@@ -68,15 +78,19 @@ export async function geocodeStoreName(
 			return null;
 		}
 
-		const nearestInRadius = candidates
+		const nearest = candidates
 			.map((candidate) => ({
 				candidate,
 				distance: distanceInKm(userPosition, candidate),
 			}))
-			.filter((item) => item.distance <= radiusKm)
 			.sort((a, b) => a.distance - b.distance)[0];
 
-		return nearestInRadius ? nearestInRadius.candidate : null;
+		if (!nearest) {
+			return null;
+		}
+
+		geocodeCache.set(cacheKey, nearest.candidate);
+		return nearest.candidate;
 	} catch {
 		return null;
 	}

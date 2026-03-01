@@ -16,22 +16,34 @@ export async function getCurrentPosition(
 	}
 
 	const timeoutMs = options.timeoutMs ?? 7000;
+	const resolvePosition = (config: PositionOptions) =>
+		new Promise<GeoPoint | null>((resolve) => {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					resolve({
+						lat: position.coords.latitude,
+						lon: position.coords.longitude,
+					});
+				},
+				() => resolve(null),
+				config,
+			);
+		});
 
-	return new Promise((resolve) => {
-		navigator.geolocation.getCurrentPosition(
-			(position) => {
-				resolve({
-					lat: position.coords.latitude,
-					lon: position.coords.longitude,
-				});
-			},
-			() => resolve(null),
-			{
-				enableHighAccuracy: false,
-				timeout: timeoutMs,
-				maximumAge: 60_000,
-			},
-		);
+	const fastPosition = await resolvePosition({
+		enableHighAccuracy: false,
+		timeout: timeoutMs,
+		maximumAge: 60_000,
+	});
+
+	if (fastPosition) {
+		return fastPosition;
+	}
+
+	return resolvePosition({
+		enableHighAccuracy: true,
+		timeout: Math.max(timeoutMs, 12_000),
+		maximumAge: 0,
 	});
 }
 
