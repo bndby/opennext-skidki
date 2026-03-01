@@ -68,7 +68,7 @@ export function CardListSection({
 								href={`/cards/${card.id}/use`}
 								className="card-menu-item"
 								style={{
-									backgroundImage: `linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, ${hexToRgba(card.color, 0.48)} 100%)`,
+									backgroundImage: `linear-gradient(90deg, ${hexToRgba(card.color, 0)} 0%, ${hexToRgba(card.color, 0.48)} 50%)`,
 								}}
 							>
 								<div className="stack card-menu-item__content">

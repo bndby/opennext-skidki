@@ -29,7 +29,8 @@ export default function RootLayout({
 		<html lang="ru">
 			<head>
 				<link rel="icon" href="/favicon.svg" type="image/svg+xml"></link>
-				<meta name="theme-color" content="#1976d2" />
+				<meta name="theme-color" media="(prefers-color-scheme: light)" content="#1976d2" />
+				<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1420" />
 				<meta name="mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 			</head>
