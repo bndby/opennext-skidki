@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
-import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
+import { subscribeToPositionChanges } from "@/lib/geolocation/get-current-position";
 import { sortCards } from "@/lib/sort/cards-sort";
 import { listCards } from "@/lib/storage/cards-repository";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
@@ -54,7 +54,18 @@ export function HomePage() {
 			return;
 		}
 
-		getCurrentPosition().then(setPosition).catch(() => setPosition(null));
+		const unsubscribe = subscribeToPositionChanges(setPosition, {
+			maximumAgeMs: 15_000,
+		});
+
+		if (!unsubscribe) {
+			setPosition(null);
+			return;
+		}
+
+		return () => {
+			unsubscribe();
+		};
 	}, [isOnline]);
 
 	useEffect(() => {

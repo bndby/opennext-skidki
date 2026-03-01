@@ -1,4 +1,4 @@
-export const STORE_BRAND_KEYS = ["custom", "varka", "gippo", "sosedi", "evroopt", "green", "prostore", "korona"] as const;
+export const STORE_BRAND_KEYS = ["custom", "varka", "gippo", "sosedi", "evroopt", "green", "prostore", "korona", "tri-ceny", "ostin", "oma"] as const;
 
 export type StoreBrandKey = (typeof STORE_BRAND_KEYS)[number];
 
@@ -75,6 +75,30 @@ const STORE_BRAND_CONFIGS: StoreBrandConfig[] = [
 		defaultStoreName: "Корона",
 		defaultCardColor: "#f9683a",
 		match: [/\bкорона\b/i, /\bkorona\b/i],
+	},
+	{
+		key: "tri-ceny",
+		label: "Три цены",
+		logoSrc: "/store-logos/tri-ceny.png",
+		defaultStoreName: "Три цены",
+		defaultCardColor: "#0088d0",
+		match: [/\bтри\s*цены\b/i, /\b3\s*цены\b/i, /\b3цены\b/i, /\b3ceni\b/i, /\btri\s*ceny\b/i],
+	},
+	{
+		key: "ostin",
+		label: "Ostin",
+		logoSrc: "/store-logos/ostin.png",
+		defaultStoreName: "Ostin",
+		defaultCardColor: "#1b1b1b",
+		match: [/\bостин\b/i, /\bostin\b/i],
+	},
+	{
+		key: "oma",
+		label: "ОМА",
+		logoSrc: "/store-logos/oma.png",
+		defaultStoreName: "ОМА",
+		defaultCardColor: "#0da018",
+		match: [/\bома\b/i, /\boma\b/i],
 	},
 ];
 
