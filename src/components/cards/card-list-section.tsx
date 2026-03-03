@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type MouseEvent, useState } from "react";
 
 import { distanceInKm } from "@/lib/sort/cards-sort";
 import { getStoreLogoMeta } from "@/lib/store-logos";
+import { ACTIVE_CARD_TRANSITION_NAME, CARD_TILE_TRANSITION_PREFIX } from "@/lib/view-transitions";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
+
+type ViewTransitionCapableDocument = Document & {
+	startViewTransition?: (callback: () => void) => { finished: Promise<void> };
+};
 
 type CardListSectionProps = {
 	title: string;
@@ -52,6 +59,45 @@ export function CardListSection({
 	showDistance,
 	isOnline,
 }: CardListSectionProps) {
+	const router = useRouter();
+	const [activeCardId, setActiveCardId] = useState<string | null>(null);
+
+	const handleTransitionNavigation = (
+		event: MouseEvent<HTMLAnchorElement>,
+		cardId: string,
+		href: string,
+	) => {
+		if (
+			event.defaultPrevented ||
+			event.button !== 0 ||
+			event.metaKey ||
+			event.ctrlKey ||
+			event.shiftKey ||
+			event.altKey
+		) {
+			return;
+		}
+
+		const viewTransitionDocument = document as ViewTransitionCapableDocument;
+		const canStartTransition = typeof viewTransitionDocument.startViewTransition === "function";
+
+		if (!canStartTransition) {
+			return;
+		}
+
+		event.preventDefault();
+		setActiveCardId(cardId);
+
+		requestAnimationFrame(() => {
+			const transition = viewTransitionDocument.startViewTransition?.(() => {
+				router.push(href);
+			});
+			void transition?.finished.finally(() => {
+				setActiveCardId(null);
+			});
+		});
+	};
+
 	return (
 		<section className="stack section-list">
 			{title ? <h2 className="title-lg title-lg--offset">{title}</h2> : null}
@@ -68,8 +114,16 @@ export function CardListSection({
 								key={card.id}
 								href={`/cards/${card.id}/use`}
 								className="card-menu-item"
+								data-active-card={activeCardId === card.id ? "true" : "false"}
+								onClick={(event) => {
+									handleTransitionNavigation(event, card.id, `/cards/${card.id}/use`);
+								}}
 								style={{
 									backgroundImage: `radial-gradient(130% 130% at 100% 50%, ${hexToRgba(card.color, 0.54)} 0%, ${hexToRgba(card.color, 0.2)} 38%, ${hexToRgba(card.color, 0)} 74%)`,
+									viewTransitionName:
+										activeCardId === card.id
+											? ACTIVE_CARD_TRANSITION_NAME
+											: `${CARD_TILE_TRANSITION_PREFIX}${card.id}`,
 								}}
 							>
 								<span

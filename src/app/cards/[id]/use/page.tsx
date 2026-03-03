@@ -9,6 +9,7 @@ import { StoreRouteMap } from "@/components/cards/store-route-map";
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
 import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
 import { getCardById, incrementCardUsage, removeCard } from "@/lib/storage/cards-repository";
+import { ACTIVE_CARD_TRANSITION_NAME } from "@/lib/view-transitions";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 
 type OsrmRouteResponse = {
@@ -211,7 +212,10 @@ export default function UseCardPage() {
 						</button>
 					</div>
 				</div>
-				<article className="card-item card-item--wide" style={{ borderLeftColor: card.color }}>
+				<article
+					className="card-item card-item--wide card-item--transition-target"
+					style={{ borderLeftColor: card.color, viewTransitionName: ACTIVE_CARD_TRANSITION_NAME }}
+				>
 					<div className="stack">
 						<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
 					</div>
