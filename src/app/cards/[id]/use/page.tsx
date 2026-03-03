@@ -214,30 +214,30 @@ export default function UseCardPage() {
 				<article className="card-item card-item--wide" style={{ borderLeftColor: card.color }}>
 					<div className="stack">
 						<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
-						<section className="store-map-block">
-							<h2 className="title-md">Ближайший магазин</h2>
-							{isMapLoading ? <p className="text-muted text-small">Определяем ближайший магазин...</p> : null}
-							{!isMapLoading && nearestStoreCoords && userPosition ? (
-								<>
-									<StoreRouteMap
-										userPosition={userPosition}
-										storePosition={nearestStoreCoords}
-										routePath={routePath}
-										storeName={card.storeName}
-									/>
-									<p className="text-muted text-small">
-										{routeDurationLabel
-											? `Пеший маршрут: ${routeDurationLabel}`
-											: "Пеший маршрут пока не удалось построить."}
-									</p>
-								</>
-							) : null}
-							{!isMapLoading && (!nearestStoreCoords || !userPosition) ? (
-								<p className="text-muted text-small">Не удалось определить вашу позицию или ближайший магазин.</p>
-							) : null}
-						</section>
 					</div>
 				</article>
+				<section className="store-map-block">
+					<h2 className="title-md">Ближайший магазин</h2>
+					{isMapLoading ? <p className="text-muted text-small">Определяем ближайший магазин...</p> : null}
+					{!isMapLoading && nearestStoreCoords && userPosition ? (
+						<>
+							<StoreRouteMap
+								userPosition={userPosition}
+								storePosition={nearestStoreCoords}
+								routePath={routePath}
+								storeName={card.storeName}
+							/>
+							<p className="text-muted text-small">
+								{routeDurationLabel
+									? `Пеший маршрут: ${routeDurationLabel}`
+									: "Пеший маршрут пока не удалось построить."}
+							</p>
+						</>
+					) : null}
+					{!isMapLoading && (!nearestStoreCoords || !userPosition) ? (
+						<p className="text-muted text-small">Не удалось определить вашу позицию или ближайший магазин.</p>
+					) : null}
+				</section>
 			</div>
 		</div>
 	);

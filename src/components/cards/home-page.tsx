@@ -149,18 +149,22 @@ export function HomePage() {
 		<div className="app-container app-container--with-fab">
 			<div className="stack">
 				{loading ? <p className="text-muted">Загрузка карточек...</p> : null}
-				{!loading && isOnline && isLocating ? (
-					<div className="row row--center row--gap-sm" role="status" aria-live="polite">
+				<div className="stack stack--tight stack--loading-indicators" aria-live="polite">
+					<div
+						className="row row--center row--gap-sm"
+						style={{ visibility: (!loading && isOnline && isLocating) ? 'visible' : 'hidden' }}
+					>
 						<span className="spinner" aria-hidden="true" />
 						<p className="text-muted text-small">Определяем ваше местоположение...</p>
 					</div>
-				) : null}
-				{!loading && isOnline && !isLocating && isResolvingNearestStores ? (
-					<div className="row row--center row--gap-sm" role="status" aria-live="polite">
+					<div
+						className="row row--center row--gap-sm"
+						style={{ visibility: (!loading && isOnline && !isLocating && isResolvingNearestStores) ? 'visible' : 'hidden' }}
+					>
 						<span className="spinner" aria-hidden="true" />
 						<p className="text-muted text-small">Ищем ближайшие магазины...</p>
 					</div>
-				) : null}
+				</div>
 
 				{!loading && cards.length === 0 ? (
 					<section className="empty-state">

@@ -182,6 +182,10 @@ a {
 	gap: 8px;
 }
 
+.stack--loading-indicators {
+	min-height: 40px;
+}
+
 .row {
 	display: flex;
 }
