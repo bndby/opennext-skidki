@@ -3,36 +3,38 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
+		"build:stores": "node scripts/build-stores.mjs",
+		"predev": "npm run build:stores",
 		"dev": "next dev --experimental-https",
+		"prebuild": "npm run build:stores",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint . --ignore-pattern .next --ignore-pattern .open-next",
-		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-		"upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+		"deploy": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+		"upload": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare upload",
+		"preview": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
 	},
 	"dependencies": {
-		"@opennextjs/cloudflare": "^1.15.1",
-		"@zxing/browser": "^0.1.5",
+		"@opennextjs/cloudflare": "^1.20.1",
+		"@zxing/browser": "0.1.5",
 		"idb": "^8.0.3",
 		"jsbarcode": "^3.12.3",
 		"leaflet": "^1.9.4",
-		"next": "16.1.5",
-		"react": "19.1.5",
-		"react-dom": "19.1.5"
+		"next": "16.2.10",
+		"react": "19.2.7",
+		"react-dom": "19.2.7"
 	},
 	"devDependencies": {
-		"@eslint/eslintrc": "^3",
-		"@tailwindcss/postcss": "^4",
+		"@tailwindcss/postcss": "^4.3.3",
 		"@types/leaflet": "^1.9.21",
-		"@types/node": "^20.19.33",
-		"@types/react": "^19.1.5",
-		"@types/react-dom": "^19.1.5",
-		"eslint": "^9",
-		"eslint-config-next": "15.4.6",
-		"tailwindcss": "^4",
-		"typescript": "^5.7.4",
-		"wrangler": "^4.67.0"
+		"@types/node": "^26.1.1",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"eslint": "^9.39.5",
+		"eslint-config-next": "16.2.10",
+		"tailwindcss": "^4.3.3",
+		"typescript": "~5.9.3",
+		"wrangler": "^4.112.0"
 	}
 }

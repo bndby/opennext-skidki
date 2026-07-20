@@ -1,6 +1,8 @@
-export const STORE_BRAND_KEYS = ["custom", "varka", "gippo", "sosedi", "evroopt", "green", "prostore", "korona", "tri-ceny", "ostin", "oma"] as const;
+import { GENERATED_STORE_BRANDS, type GeneratedStoreBrandKey } from "./stores.generated";
 
-export type StoreBrandKey = (typeof STORE_BRAND_KEYS)[number];
+export const STORE_BRAND_KEYS = ["custom", ...GENERATED_STORE_BRANDS.map((brand) => brand.key)] as const;
+
+export type StoreBrandKey = "custom" | GeneratedStoreBrandKey;
 
 type StoreBrandConfig = {
 	key: StoreBrandKey;
@@ -9,97 +11,25 @@ type StoreBrandConfig = {
 	defaultStoreName: string;
 	defaultCardColor: string;
 	match: RegExp[];
+	description: string;
+};
+
+const CUSTOM_STORE_BRAND: StoreBrandConfig = {
+	key: "custom",
+	label: "Другой магазин",
+	logoSrc: null,
+	defaultStoreName: "",
+	defaultCardColor: "#1976d2",
+	match: [],
+	description: "",
 };
 
 const STORE_BRAND_CONFIGS: StoreBrandConfig[] = [
-	{
-		key: "custom",
-		label: "Другой магазин",
-		logoSrc: null,
-		defaultStoreName: "",
-		defaultCardColor: "#1976d2",
-		match: [],
-	},
-	{
-		key: "varka",
-		label: "VARKA",
-		logoSrc: "/store-logos/varka.svg",
-		defaultStoreName: "VARKA",
-		defaultCardColor: "#1b1b1b",
-		match: [/\bvarka\b/i, /варка/i],
-	},
-	{
-		key: "gippo",
-		label: "Гиппо",
-		logoSrc: "/store-logos/gippo.png",
-		defaultStoreName: "Гиппо",
-		defaultCardColor: "#e95d1f",
-		match: [/\bгиппо\b/i, /\bgippo\b/i],
-	},
-	{
-		key: "sosedi",
-		label: "Соседи",
-		logoSrc: "/store-logos/sosedi.png",
-		defaultStoreName: "Соседи",
-		defaultCardColor: "#0081c9",
-		match: [/\bсоседи\b/i, /\bsosedi\b/i],
-	},
-	{
-		key: "evroopt",
-		label: "Евроопт",
-		logoSrc: "/store-logos/evroopt.svg",
-		defaultStoreName: "Евроопт",
-		defaultCardColor: "#8fc641",
-		match: [/\bевроопт\b/i, /\bevroopt\b/i],
-	},
-	{
-		key: "green",
-		label: "Грин",
-		logoSrc: "/store-logos/green.svg",
-		defaultStoreName: "Green",
-		defaultCardColor: "#0da018",
-		match: [/\bgreen\b/i, /\bгрин\b/i],
-	},
-	{
-		key: "prostore",
-		label: "ProStore",
-		logoSrc: "/store-logos/prostore.png",
-		defaultStoreName: "ProStore",
-		defaultCardColor: "#042d95",
-		match: [/\bpro\s?store\b/i, /\bпростор\b/i],
-	},
-	{
-		key: "korona",
-		label: "Корона",
-		logoSrc: "/store-logos/korona.svg",
-		defaultStoreName: "Корона",
-		defaultCardColor: "#f9683a",
-		match: [/\bкорона\b/i, /\bkorona\b/i],
-	},
-	{
-		key: "tri-ceny",
-		label: "Три цены",
-		logoSrc: "/store-logos/tri-ceny.png",
-		defaultStoreName: "Три цены",
-		defaultCardColor: "#0088d0",
-		match: [/\bтри\s*цены\b/i, /\b3\s*цены\b/i, /\b3цены\b/i, /\b3ceni\b/i, /\btri\s*ceny\b/i],
-	},
-	{
-		key: "ostin",
-		label: "Ostin",
-		logoSrc: "/store-logos/ostin.png",
-		defaultStoreName: "Ostin",
-		defaultCardColor: "#1b1b1b",
-		match: [/\bостин\b/i, /\bostin\b/i],
-	},
-	{
-		key: "oma",
-		label: "ОМА",
-		logoSrc: "/store-logos/oma.png",
-		defaultStoreName: "ОМА",
-		defaultCardColor: "#0da018",
-		match: [/\bома\b/i, /\boma\b/i],
-	},
+	CUSTOM_STORE_BRAND,
+	...GENERATED_STORE_BRANDS.map((brand) => ({
+		...brand,
+		match: brand.match.map((pattern) => new RegExp(pattern, "i")),
+	})),
 ];
 
 const STORE_BRANDS_MAP = new Map(STORE_BRAND_CONFIGS.map((brand) => [brand.key, brand]));

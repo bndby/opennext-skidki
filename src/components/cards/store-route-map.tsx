@@ -25,12 +25,10 @@ export function StoreRouteMap({ userPosition, storePosition, routePath, storeNam
 				return;
 			}
 
-			const leafletModule = await import("leaflet");
+			const [{ default: L }] = await Promise.all([import("leaflet"), import("leaflet/dist/leaflet.css")]);
 			if (cancelled) {
 				return;
 			}
-
-			const L = leafletModule.default;
 
 			if (!mapInstanceRef.current) {
 				const map = L.map(mapContainerRef.current, {

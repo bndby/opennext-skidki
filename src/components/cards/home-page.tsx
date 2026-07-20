@@ -1,16 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
 import { subscribeToPositionChanges } from "@/lib/geolocation/get-current-position";
+import {
+	precacheCardShellsInServiceWorker,
+	prefetchCardRoutes,
+	warmCardPageChunks,
+} from "@/lib/performance/prefetch-cards";
 import { sortCards } from "@/lib/sort/cards-sort";
 import { listCards } from "@/lib/storage/cards-repository";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 import { CardListSection } from "./card-list-section";
 
 export function HomePage() {
+	const router = useRouter();
 	const [cards, setCards] = useState<DiscountCard[]>([]);
 	const [isOnline, setIsOnline] = useState(false);
 	const [position, setPosition] = useState<GeoPoint | null>(null);
@@ -29,6 +36,17 @@ export function HomePage() {
 	useEffect(() => {
 		loadCards().catch(() => setLoading(false));
 	}, [loadCards]);
+
+	useEffect(() => {
+		if (loading) {
+			return;
+		}
+
+		const cardIds = cards.map((card) => card.id);
+		prefetchCardRoutes(router, cardIds);
+		precacheCardShellsInServiceWorker(cardIds);
+		warmCardPageChunks();
+	}, [cards, loading, router]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") {
@@ -152,14 +170,16 @@ export function HomePage() {
 				<div className="stack stack--tight stack--loading-indicators" aria-live="polite">
 					<div
 						className="row row--center row--gap-sm"
-						style={{ visibility: (!loading && isOnline && isLocating) ? 'visible' : 'hidden' }}
+						style={{ visibility: (!loading && isOnline && isLocating) ? "visible" : "hidden" }}
 					>
 						<span className="spinner" aria-hidden="true" />
 						<p className="text-muted text-small">Определяем ваше местоположение...</p>
 					</div>
 					<div
 						className="row row--center row--gap-sm"
-						style={{ visibility: (!loading && isOnline && !isLocating && isResolvingNearestStores) ? 'visible' : 'hidden' }}
+						style={{
+							visibility: (!loading && isOnline && !isLocating && isResolvingNearestStores) ? "visible" : "hidden",
+						}}
 					>
 						<span className="spinner" aria-hidden="true" />
 						<p className="text-muted text-small">Ищем ближайшие магазины...</p>
@@ -182,7 +202,7 @@ export function HomePage() {
 					/>
 				) : null}
 			</div>
-			<Link href="/cards/new" className="fab" aria-label="Добавить карточку">
+			<Link href="/cards/new" className="fab" aria-label="Добавить карточку" prefetch>
 				<svg className="fab__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 					<path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
 				</svg>

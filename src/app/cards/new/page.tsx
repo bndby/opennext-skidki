@@ -1,30 +1,7 @@
-"use client";
+import { NewCardPage } from "@/components/cards/new-card-page";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+export const dynamic = "force-static";
 
-import { CardForm } from "@/components/cards/card-form";
-import { createCard } from "@/lib/storage/cards-repository";
-
-export default function NewCardPage() {
-	const router = useRouter();
-
-	return (
-		<div className="app-container app-container--page">
-			<div className="stack">
-				<Link href="/" className="btn btn--ghost btn--fit">
-					Назад
-				</Link>
-				<h1 className="title-xl">Новая карточка</h1>
-				<CardForm
-					submitLabel="Сохранить карточку"
-					enableBrandPresetPicker
-					onSubmit={async (payload) => {
-						await createCard(payload);
-						router.push("/");
-					}}
-				/>
-			</div>
-		</div>
-	);
+export default function Page() {
+	return <NewCardPage />;
 }

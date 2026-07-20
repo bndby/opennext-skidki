@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
 
 :root {
 	--background: #eef2f8;
@@ -48,8 +47,6 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -592,6 +589,18 @@ a {
 	max-width: 100%;
 }
 
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
 .scanner-preview {
 	border: 1px dashed var(--surface-border);
 	border-radius: 12px;
@@ -601,6 +610,14 @@ a {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	position: relative;
+}
+
+.scanner-preview__video {
+	width: 100%;
+	height: 220px;
+	object-fit: cover;
+	background: #000;
 }
 
 .scanner-preview__label {
