@@ -7,6 +7,30 @@ type NominatimResult = {
 
 export const dynamic = "force-dynamic";
 
+const NOMINATIM_MIN_INTERVAL_MS = 1100;
+const NOMINATIM_USER_AGENT = "opennext-skidki/1.0 (https://github.com/bndby/opennext-skidki)";
+
+let lastNominatimAt = 0;
+let nominatimChain: Promise<void> = Promise.resolve();
+
+function enqueueNominatim<T>(task: () => Promise<T>): Promise<T> {
+	const run = nominatimChain.then(async () => {
+		const wait = Math.max(0, NOMINATIM_MIN_INTERVAL_MS - (Date.now() - lastNominatimAt));
+		if (wait > 0) {
+			await new Promise((resolve) => setTimeout(resolve, wait));
+		}
+		lastNominatimAt = Date.now();
+		return task();
+	});
+
+	nominatimChain = run.then(
+		() => undefined,
+		() => undefined,
+	);
+
+	return run;
+}
+
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const query = searchParams.get("q")?.trim();
@@ -38,19 +62,23 @@ export async function GET(request: Request) {
 	url.searchParams.set("bounded", "1");
 
 	try {
-		const response = await fetch(url.toString(), {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "opennext-skidki/1.0 (local development)",
-			},
-			cache: "no-store",
+		const payload = await enqueueNominatim(async () => {
+			const response = await fetch(url.toString(), {
+				headers: {
+					Accept: "application/json",
+					"Accept-Language": "ru,en;q=0.8",
+					"User-Agent": NOMINATIM_USER_AGENT,
+				},
+				cache: "no-store",
+			});
+
+			if (!response.ok) {
+				return [] as NominatimResult[];
+			}
+
+			return (await response.json()) as NominatimResult[];
 		});
 
-		if (!response.ok) {
-			return NextResponse.json([], { status: 200 });
-		}
-
-		const payload = (await response.json()) as NominatimResult[];
 		return NextResponse.json(payload, { status: 200 });
 	} catch {
 		return NextResponse.json([], { status: 200 });

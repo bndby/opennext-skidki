@@ -1,23 +1,7 @@
+import { NEARBY_RADIUS_KM, distanceInKm } from "@/lib/geo/distance";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 
-const NEARBY_RADIUS_KM = 3;
-
-function toRad(value: number) {
-	return (value * Math.PI) / 180;
-}
-
-export function distanceInKm(from: GeoPoint, to: GeoPoint) {
-	const R = 6371;
-	const dLat = toRad(to.lat - from.lat);
-	const dLon = toRad(to.lon - from.lon);
-
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(toRad(from.lat)) * Math.cos(toRad(to.lat)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	return R * c;
-}
+export { distanceInKm, NEARBY_RADIUS_KM };
 
 function byUsageThenUpdated(a: DiscountCard, b: DiscountCard) {
 	if (b.usageCount !== a.usageCount) {
@@ -30,13 +14,12 @@ function byUsageThenUpdated(a: DiscountCard, b: DiscountCard) {
 export function sortCards(
 	cards: DiscountCard[],
 	options: {
-		isOnline: boolean;
 		userPosition: GeoPoint | null;
 	},
 ) {
-	const { isOnline, userPosition } = options;
+	const { userPosition } = options;
 
-	if (!isOnline || !userPosition) {
+	if (!userPosition) {
 		return [...cards].sort((a, b) => {
 			if (a.isFavorite !== b.isFavorite) {
 				return a.isFavorite ? -1 : 1;
@@ -66,11 +49,4 @@ export function sortCards(
 
 		return byUsageThenUpdated(a, b);
 	});
-}
-
-export function splitByFavorite(cards: DiscountCard[]) {
-	const favorites = cards.filter((card) => card.isFavorite);
-	const regular = cards.filter((card) => !card.isFavorite);
-
-	return { favorites, regular };
 }

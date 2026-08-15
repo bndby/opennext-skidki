@@ -1,5 +1,6 @@
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
+import sharp from "sharp";
 
 const ROOT_DIR = resolve(import.meta.dirname, "..");
 const STORES_DIR = join(ROOT_DIR, "content", "stores");
@@ -8,6 +9,9 @@ const GENERATED_FILE = join(ROOT_DIR, "src", "lib", "stores.generated.ts");
 const LOGO_FILE_PATTERN = /^logo\.(svg|png|webp|jpe?g)$/i;
 const STORE_KEY_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const FRONTMATTER_FIELDS = new Set(["label", "defaultStoreName", "defaultCardColor", "match"]);
+const MAX_LOGO_PX = 256;
+const UNICODE_WORD_BOUNDARY =
+	String.raw`(?:(?<=^|[^\p{L}\p{N}_])(?=[\p{L}\p{N}_])|(?<=[\p{L}\p{N}_])(?=$|[^\p{L}\p{N}_]))`;
 
 function fail(message) {
 	throw new Error(`[build-stores] ${message}`);
@@ -126,7 +130,7 @@ function parseStoreMarkdown(filePath) {
 		}
 
 		try {
-			new RegExp(pattern, "i");
+			new RegExp(pattern.replaceAll("\\b", UNICODE_WORD_BOUNDARY), "iu");
 		} catch (error) {
 			fail(`${filePath}: match[${index}] содержит некорректный regex (${error.message}).`);
 		}
@@ -217,15 +221,52 @@ export type GeneratedStoreBrandKey = (typeof GENERATED_STORE_BRANDS)[number]["ke
 `;
 }
 
-function buildStores() {
+async function writeLogo(store) {
+	const destination = join(PUBLIC_LOGOS_DIR, `${store.key}.${store.logoExtension}`);
+	if (store.logoExtension === "svg") {
+		copyFileSync(store.logoFile, destination);
+		return;
+	}
+
+	try {
+		let image = sharp(store.logoFile);
+		const meta = await image.metadata();
+		if ((meta.width ?? 0) > MAX_LOGO_PX || (meta.height ?? 0) > MAX_LOGO_PX) {
+			image = image.resize(MAX_LOGO_PX, MAX_LOGO_PX, {
+				fit: "inside",
+				withoutEnlargement: true,
+			});
+		}
+
+		if (store.logoExtension === "png") {
+			await image.png({ compressionLevel: 9, palette: true }).toFile(destination);
+			return;
+		}
+
+		if (store.logoExtension === "webp") {
+			await image.webp({ quality: 82 }).toFile(destination);
+			return;
+		}
+
+		if (store.logoExtension === "jpg" || store.logoExtension === "jpeg") {
+			await image.jpeg({ quality: 82, mozjpeg: true }).toFile(destination);
+			return;
+		}
+	} catch (error) {
+		console.warn(`[build-stores] не удалось сжать ${store.logoFile}: ${error.message}. Копирую исходник.`);
+	}
+
+	copyFileSync(store.logoFile, destination);
+}
+
+async function buildStores() {
 	const stores = readStores();
 
 	rmSync(PUBLIC_LOGOS_DIR, { recursive: true, force: true });
 	mkdirSync(PUBLIC_LOGOS_DIR, { recursive: true });
 
 	for (const store of stores) {
-		const destination = join(PUBLIC_LOGOS_DIR, `${store.key}.${store.logoExtension}`);
-		copyFileSync(store.logoFile, destination);
+		await writeLogo(store);
 	}
 
 	mkdirSync(join(ROOT_DIR, "src", "lib"), { recursive: true });
@@ -234,4 +275,4 @@ function buildStores() {
 	console.log(`[build-stores] Сгенерировано магазинов: ${stores.length}.`);
 }
 
-buildStores();
+await buildStores();

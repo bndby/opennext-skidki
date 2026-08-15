@@ -8,7 +8,9 @@ import { useEffect, useState } from "react";
 import { BarcodePreview } from "@/components/cards/barcode-preview";
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
 import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
-import { getCardById, incrementCardUsage, removeCard } from "@/lib/storage/cards-repository";
+import { estimateWalkingDurationSec, distanceInKm } from "@/lib/geo/distance";
+import { getWalkingDirectionsUrl } from "@/lib/maps/external-directions";
+import { getCardById, incrementCardUsage, persistStoreCoordsByStoreName, removeCard } from "@/lib/storage/cards-repository";
 import { ACTIVE_CARD_TRANSITION_NAME } from "@/lib/view-transitions";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
 
@@ -20,38 +22,7 @@ const StoreRouteMap = dynamic(
 	},
 );
 
-type OsrmRouteResponse = {
-	routes?: Array<{
-		duration: number;
-		geometry: {
-			coordinates: [number, number][];
-		};
-	}>;
-};
-
-async function getWalkingRoute(from: GeoPoint, to: GeoPoint) {
-	const routeUrl = new URL(
-		`https://router.project-osrm.org/route/v1/foot/${from.lon},${from.lat};${to.lon},${to.lat}`,
-	);
-	routeUrl.searchParams.set("overview", "full");
-	routeUrl.searchParams.set("geometries", "geojson");
-
-	const response = await fetch(routeUrl.toString());
-	if (!response.ok) {
-		return null;
-	}
-
-	const payload = (await response.json()) as OsrmRouteResponse;
-	const firstRoute = payload.routes?.[0];
-	if (!firstRoute) {
-		return null;
-	}
-
-	return {
-		durationSec: firstRoute.duration,
-		path: firstRoute.geometry.coordinates.map(([lon, lat]) => ({ lat, lon })),
-	};
-}
+const USAGE_INCREMENT_DELAY_MS = 1200;
 
 export function UseCardPage() {
 	const params = useParams<{ id: string }>();
@@ -61,42 +32,75 @@ export function UseCardPage() {
 	const [nearestStoreCoords, setNearestStoreCoords] = useState<GeoPoint | null>(null);
 	const [isMapLoading, setIsMapLoading] = useState(false);
 	const [userPosition, setUserPosition] = useState<GeoPoint | null>(null);
-	const [routePath, setRoutePath] = useState<GeoPoint[]>([]);
-	const [routeDurationSec, setRouteDurationSec] = useState<number | null>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	useEffect(() => {
-		incrementCardUsage(params.id)
-			.then((updated) => {
-				setCard(updated);
-			})
-			.catch(async () => {
-				const fallback = await getCardById(params.id);
-				if (!fallback) {
+		let cancelled = false;
+
+		getCardById(params.id)
+			.then((result) => {
+				if (cancelled) {
+					return;
+				}
+
+				if (!result) {
 					setNotFound(true);
 					return;
 				}
-				setCard(fallback);
+
+				setCard(result);
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setNotFound(true);
+				}
 			});
+
+		return () => {
+			cancelled = true;
+		};
 	}, [params.id]);
 
+	const loadedCardId = card?.id ?? null;
+	const loadedStoreName = card?.storeName ?? "";
+	const fallbackStoreLat = card?.storeCoords?.lat ?? null;
+	const fallbackStoreLon = card?.storeCoords?.lon ?? null;
+
 	useEffect(() => {
-		if (!card) {
+		if (!loadedCardId) {
+			return;
+		}
+
+		const cardId = loadedCardId;
+		const timer = window.setTimeout(() => {
+			incrementCardUsage(cardId)
+				.then((updated) => {
+					setCard((current) => (current?.id === cardId ? updated : current));
+				})
+				.catch(() => undefined);
+		}, USAGE_INCREMENT_DELAY_MS);
+
+		return () => {
+			window.clearTimeout(timer);
+		};
+	}, [loadedCardId]);
+
+	useEffect(() => {
+		if (!loadedCardId || !loadedStoreName) {
 			setNearestStoreCoords(null);
 			setUserPosition(null);
-			setRoutePath([]);
-			setRouteDurationSec(null);
 			return;
 		}
 
 		let cancelled = false;
-		const storeName = card.storeName;
-		const fallbackStoreCoords = card.storeCoords;
+		const storeName = loadedStoreName;
+		const fallbackStoreCoords =
+			fallbackStoreLat != null && fallbackStoreLon != null
+				? { lat: fallbackStoreLat, lon: fallbackStoreLon }
+				: null;
 
 		async function resolveNearestStore() {
 			setIsMapLoading(true);
-			setRoutePath([]);
-			setRouteDurationSec(null);
 
 			const nextUserPosition = await getCurrentPosition();
 			if (!cancelled) {
@@ -108,15 +112,12 @@ export function UseCardPage() {
 			});
 			const coords = geocodedCoords ?? fallbackStoreCoords ?? null;
 
-			let walkingRoute: { durationSec: number; path: GeoPoint[] } | null = null;
-			if (nextUserPosition && coords) {
-				walkingRoute = await getWalkingRoute(nextUserPosition, coords).catch(() => null);
+			if (geocodedCoords) {
+				void persistStoreCoordsByStoreName(storeName, geocodedCoords);
 			}
 
 			if (!cancelled) {
 				setNearestStoreCoords(coords);
-				setRoutePath(walkingRoute?.path ?? []);
-				setRouteDurationSec(walkingRoute?.durationSec ?? null);
 				setIsMapLoading(false);
 			}
 		}
@@ -125,8 +126,6 @@ export function UseCardPage() {
 			if (!cancelled) {
 				setNearestStoreCoords(null);
 				setUserPosition(null);
-				setRoutePath([]);
-				setRouteDurationSec(null);
 				setIsMapLoading(false);
 			}
 		});
@@ -134,12 +133,18 @@ export function UseCardPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [card]);
+	}, [loadedCardId, loadedStoreName, fallbackStoreLat, fallbackStoreLon]);
 
+	const walkingDistanceKm =
+		nearestStoreCoords && userPosition ? distanceInKm(userPosition, nearestStoreCoords) : null;
+	const walkingDurationSec = walkingDistanceKm == null ? null : estimateWalkingDurationSec(walkingDistanceKm);
 	const routeDurationLabel =
-		routeDurationSec && Number.isFinite(routeDurationSec)
-			? `${Math.max(1, Math.round(routeDurationSec / 60))} мин`
+		walkingDurationSec && Number.isFinite(walkingDurationSec)
+			? `${Math.max(1, Math.round(walkingDurationSec / 60))} мин`
 			: null;
+	const directionsUrl =
+		nearestStoreCoords && userPosition ? getWalkingDirectionsUrl(userPosition, nearestStoreCoords) : null;
+	const straightPath = nearestStoreCoords && userPosition ? [userPosition, nearestStoreCoords] : [];
 
 	if (notFound) {
 		return (
@@ -158,6 +163,11 @@ export function UseCardPage() {
 	}
 
 	const handleDelete = async () => {
+		const isConfirmed = window.confirm("Удалить карточку? Это действие нельзя отменить.");
+		if (!isConfirmed) {
+			return;
+		}
+
 		setIsDeleting(true);
 		try {
 			await removeCard(card.id);
@@ -236,14 +246,19 @@ export function UseCardPage() {
 							<StoreRouteMap
 								userPosition={userPosition}
 								storePosition={nearestStoreCoords}
-								routePath={routePath}
+								routePath={straightPath}
 								storeName={card.storeName}
 							/>
 							<p className="text-muted text-small">
 								{routeDurationLabel
-									? `Пеший маршрут: ${routeDurationLabel}`
-									: "Пеший маршрут пока не удалось построить."}
+									? `Оценка пешком по прямой: ${routeDurationLabel}`
+									: "Не удалось оценить время в пути."}
 							</p>
+							{directionsUrl ? (
+								<a className="btn btn--outline btn--fit" href={directionsUrl} target="_blank" rel="noreferrer">
+									Открыть маршрут в картах
+								</a>
+							) : null}
 						</>
 					) : null}
 					{!isMapLoading && (!nearestStoreCoords || !userPosition) ? (

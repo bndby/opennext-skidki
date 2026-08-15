@@ -4,7 +4,7 @@ defaultStoreName: VARKA
 defaultCardColor: "#1b1b1b"
 match:
   - "\\bvarka\\b"
-  - "варка"
+  - "\\bварка\\b"
 ---
 
 Сеть магазинов VARKA.

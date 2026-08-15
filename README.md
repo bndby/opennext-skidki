@@ -1,47 +1,47 @@
-# OpenNext Starter
+# Скидочные карты
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Офлайн PWA для хранения дисконтных карт: штрихкоды лежат в IndexedDB на устройстве, сервер нужен только для геокодирования ближайшего магазина.
 
-## Getting Started
+## Возможности
 
-Read the documentation at https://opennext.js.org/cloudflare.
+- добавление карты вручную или со сканера (фото на iOS, live-камера на остальных устройствах);
+- показ штрихкода на кассе;
+- избранное и сортировка по близости магазина;
+- экспорт и импорт карточек в JSON — сделайте бэкап, Safari может очистить IndexedDB;
+- установка на домашний экран как PWA.
 
-## Develop
-
-Run the Next.js development server:
+## Разработка
 
 ```bash
+npm install
 npm run dev
-# or similar package manager command
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откройте https://localhost:3000. `predev` и `prebuild` сами генерируют бренды магазинов и PNG-иконки.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm test
+npm run lint
+```
 
-## Preview
+## Магазины
 
-Preview the application locally on the Cloudflare runtime:
+Предустановленные бренды лежат в `content/stores/<ключ>/`. Как добавить новый — в [content/stores/README.md](content/stores/README.md).
+
+Растровые логотипы сжимаются до 256 px на этапе `npm run build:stores`.
+
+## Гео и карты
+
+- `/api/geocode` проксирует Nominatim с идентифицирующим User-Agent и ограничением 1 запрос/с.
+- Публичный demo OSRM не используется. На карте — прямая линия и оценка времени пешком, маршрут открывается в системных картах.
+
+## Деплой
+
+Приложение собирается через OpenNext и уходит на Cloudflare:
 
 ```bash
 npm run preview
-# or similar package manager command
-```
-
-## Deploy
-
-Deploy the application to Cloudflare:
-
-```bash
 npm run deploy
-# or similar package manager command
 ```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Документация OpenNext: https://opennext.js.org/cloudflare.

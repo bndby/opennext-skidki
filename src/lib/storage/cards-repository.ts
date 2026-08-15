@@ -1,6 +1,8 @@
+import { sameGeoPoint } from "@/lib/geo/distance";
+import { toStoredBarcodeFormat } from "@/lib/barcode/formats";
 import { CARDS_STORE, getDb } from "@/lib/storage/db";
 import { normalizeStoreBrandKey } from "@/lib/store-logos";
-import type { DiscountCard, UpsertDiscountCardInput } from "@/types/discount-card";
+import type { DiscountCard, GeoPoint, UpsertDiscountCardInput } from "@/types/discount-card";
 
 function nowIso() {
 	return new Date().toISOString();
@@ -36,7 +38,7 @@ export async function createCard(input: UpsertDiscountCardInput) {
 		storeBrandKey: normalizeStoreBrandKey(input.storeBrandKey, input.storeName),
 		storeLogoDataUrl: input.storeLogoDataUrl ?? null,
 		barcodeValue: input.barcodeValue.trim(),
-		barcodeFormat: input.barcodeFormat.trim() || "CODE128",
+		barcodeFormat: toStoredBarcodeFormat(input.barcodeFormat.trim() || "CODE128"),
 		color: input.color,
 		isFavorite: input.isFavorite,
 		usageCount: 0,
@@ -64,7 +66,7 @@ export async function updateCard(id: string, input: UpsertDiscountCardInput) {
 		storeBrandKey: normalizeStoreBrandKey(input.storeBrandKey, input.storeName),
 		storeLogoDataUrl: input.storeLogoDataUrl ?? existing.storeLogoDataUrl ?? null,
 		barcodeValue: input.barcodeValue.trim(),
-		barcodeFormat: input.barcodeFormat.trim() || existing.barcodeFormat || "CODE128",
+		barcodeFormat: toStoredBarcodeFormat(input.barcodeFormat.trim() || existing.barcodeFormat || "CODE128"),
 		color: input.color,
 		isFavorite: input.isFavorite,
 		storeCoords: input.storeCoords,
@@ -73,6 +75,35 @@ export async function updateCard(id: string, input: UpsertDiscountCardInput) {
 
 	await db.put(CARDS_STORE, updated);
 	return updated;
+}
+
+export async function putCard(card: DiscountCard) {
+	const db = await getDb();
+	await db.put(CARDS_STORE, normalizeCard(card));
+}
+
+export async function persistStoreCoordsByStoreName(storeName: string, coords: GeoPoint) {
+	const db = await getDb();
+	const trimmedName = storeName.trim();
+	if (!trimmedName) {
+		return;
+	}
+
+	const cards = await db.getAll(CARDS_STORE);
+	for (const card of cards) {
+		if (card.storeName.trim() !== trimmedName) {
+			continue;
+		}
+
+		if (sameGeoPoint(card.storeCoords, coords)) {
+			continue;
+		}
+
+		await db.put(CARDS_STORE, {
+			...normalizeCard(card),
+			storeCoords: coords,
+		});
+	}
 }
 
 export async function removeCard(id: string) {
