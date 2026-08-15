@@ -84,7 +84,8 @@ export function CardForm({ initialCard, submitLabel, enableBrandPresetPicker = f
 				barcodeFormat,
 				color,
 				isFavorite,
-				storeCoords: null,
+				storeCoords:
+					initialCard && initialCard.storeName.trim() === storeName.trim() ? (initialCard.storeCoords ?? null) : null,
 			});
 		} catch {
 			setFormError("Не удалось сохранить карточку.");

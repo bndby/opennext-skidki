@@ -4,15 +4,18 @@
 	"private": true,
 	"scripts": {
 		"build:stores": "node scripts/build-stores.mjs",
-		"predev": "npm run build:stores",
+		"build:icons": "node scripts/build-pwa-icons.mjs",
+		"predev": "npm run build:stores && npm run build:icons",
 		"dev": "next dev --experimental-https",
-		"prebuild": "npm run build:stores",
+		"prebuild": "npm run build:stores && npm run build:icons",
 		"build": "next build",
 		"start": "next start",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"lint": "eslint . --ignore-pattern .next --ignore-pattern .open-next",
-		"deploy": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-		"upload": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare upload",
-		"preview": "npm run build:stores && opennextjs-cloudflare build && opennextjs-cloudflare preview",
+		"deploy": "npm run build:stores && npm run build:icons && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+		"upload": "npm run build:stores && npm run build:icons && opennextjs-cloudflare build && opennextjs-cloudflare upload",
+		"preview": "npm run build:stores && npm run build:icons && opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
 	},
 	"dependencies": {
@@ -33,8 +36,10 @@
 		"@types/react-dom": "^19.2.3",
 		"eslint": "^9.39.5",
 		"eslint-config-next": "16.2.10",
+		"sharp": "^0.35.3",
 		"tailwindcss": "^4.3.3",
 		"typescript": "~5.9.3",
+		"vitest": "^4.1.10",
 		"wrangler": "^4.112.0"
 	}
 }

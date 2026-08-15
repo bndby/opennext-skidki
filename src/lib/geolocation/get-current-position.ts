@@ -55,15 +55,20 @@ export function subscribeToPositionChanges(
 		return null;
 	}
 
+	let lastGoodPosition: GeoPoint | null = null;
+
 	const watchId = navigator.geolocation.watchPosition(
 		(position) => {
-			onPositionChange({
+			lastGoodPosition = {
 				lat: position.coords.latitude,
 				lon: position.coords.longitude,
-			});
+			};
+			onPositionChange(lastGoodPosition);
 		},
 		() => {
-			onPositionChange(null);
+			if (lastGoodPosition === null) {
+				onPositionChange(null);
+			}
 		},
 		{
 			enableHighAccuracy: false,

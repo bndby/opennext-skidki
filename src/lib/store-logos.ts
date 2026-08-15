@@ -1,3 +1,4 @@
+import { compileStoreMatchPattern } from "@/lib/text/unicode-word-boundary";
 import { GENERATED_STORE_BRANDS, type GeneratedStoreBrandKey } from "./stores.generated";
 
 export const STORE_BRAND_KEYS = ["custom", ...GENERATED_STORE_BRANDS.map((brand) => brand.key)] as const;
@@ -28,7 +29,7 @@ const STORE_BRAND_CONFIGS: StoreBrandConfig[] = [
 	CUSTOM_STORE_BRAND,
 	...GENERATED_STORE_BRANDS.map((brand) => ({
 		...brand,
-		match: brand.match.map((pattern) => new RegExp(pattern, "i")),
+		match: brand.match.map((pattern) => compileStoreMatchPattern(pattern)),
 	})),
 ];
 

@@ -282,7 +282,8 @@ a {
 	transition: 0.15s ease;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn--disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
 }
@@ -582,11 +583,12 @@ a {
 	border-color: var(--danger-border);
 }
 
-.barcode-mini-preview {
-	display: inline-flex;
-	background: #fff;
-	overflow: hidden;
-	max-width: 100%;
+.barcode-value {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	font-variant-numeric: tabular-nums;
 }
 
 .sr-only {
@@ -714,6 +716,12 @@ a {
 	color: var(--danger-fg);
 	background: var(--danger-bg);
 	border: 1px solid var(--danger-border);
+}
+
+.alert--success {
+	color: var(--success-fg);
+	background: var(--success-bg);
+	border: 1px solid transparent;
 }
 
 .alert--warning {

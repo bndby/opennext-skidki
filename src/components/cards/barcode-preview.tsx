@@ -3,38 +3,33 @@
 import JsBarcode from "jsbarcode";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { toJsBarcodeFormat } from "@/lib/barcode/formats";
+
 type BarcodePreviewProps = {
 	value: string;
 	format: string;
 };
 
-const JS_BARCODE_FORMATS = new Set([
-	"CODE128",
-	"CODE39",
-	"EAN13",
-	"EAN8",
-	"UPC",
-	"UPCA",
-	"ITF14",
-]);
-
 export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 	const svgRef = useRef<SVGSVGElement | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	const normalizedFormat = useMemo(() => {
-		const upper = format.toUpperCase();
-		return JS_BARCODE_FORMATS.has(upper) ? upper : "CODE128";
-	}, [format]);
+	const jsBarcodeFormat = useMemo(() => toJsBarcodeFormat(format), [format]);
 
 	useEffect(() => {
 		if (!svgRef.current || !value.trim()) {
 			return;
 		}
 
+		if (!jsBarcodeFormat) {
+			svgRef.current.replaceChildren();
+			setError("Этот формат штрихкода нельзя нарисовать. Покажите кассиру числовое значение.");
+			return;
+		}
+
 		try {
 			JsBarcode(svgRef.current, value, {
-				format: normalizedFormat,
+				format: jsBarcodeFormat,
 				displayValue: true,
 				lineColor: "#000000",
 				background: "#ffffff",
@@ -44,16 +39,20 @@ export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 			});
 			setError(null);
 		} catch {
-			setError("Не удалось отрисовать штрихкод. Проверьте значение.");
+			svgRef.current.replaceChildren();
+			setError("Не удалось отрисовать штрихкод. Проверьте значение и формат.");
 		}
-	}, [normalizedFormat, value]);
+	}, [jsBarcodeFormat, value]);
 
 	return (
 		<div className="stack stack--tight">
-			<svg ref={svgRef} style={{ display: "block", margin: "0 auto", maxWidth: "100%" }} />
+			<svg ref={svgRef} style={{ display: jsBarcodeFormat && !error ? "block" : "none", margin: "0 auto", maxWidth: "100%" }} />
+			<p className="barcode-value" style={{ textAlign: "center" }}>
+				{value}
+			</p>
 			{error ? <p className="alert alert--warning">{error}</p> : null}
 			<p className="text-muted text-small" style={{ textAlign: "center" }}>
-				Формат: {normalizedFormat}
+				Формат: {jsBarcodeFormat ?? format}
 			</p>
 		</div>
 	);

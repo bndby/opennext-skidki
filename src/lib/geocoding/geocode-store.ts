@@ -1,3 +1,4 @@
+import { distanceInKm, geoBucketKey } from "@/lib/geo/distance";
 import type { GeoPoint } from "@/types/discount-card";
 
 type NominatimResult = {
@@ -6,23 +7,6 @@ type NominatimResult = {
 };
 
 const geocodeCache = new Map<string, GeoPoint>();
-
-function toRad(value: number) {
-	return (value * Math.PI) / 180;
-}
-
-function distanceInKm(from: GeoPoint, to: GeoPoint) {
-	const R = 6371;
-	const dLat = toRad(to.lat - from.lat);
-	const dLon = toRad(to.lon - from.lon);
-
-	const a =
-		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(toRad(from.lat)) * Math.cos(toRad(to.lat)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	return R * c;
-}
 
 export async function geocodeStoreName(
 	storeName: string,
@@ -44,9 +28,7 @@ export async function geocodeStoreName(
 		return null;
 	}
 
-	const roundedLat = userPosition.lat.toFixed(3);
-	const roundedLon = userPosition.lon.toFixed(3);
-	const cacheKey = `${query.toLowerCase()}|${roundedLat}|${roundedLon}|${radiusKm}`;
+	const cacheKey = `${query.toLowerCase()}|${geoBucketKey(userPosition)}|${radiusKm}`;
 	const cached = geocodeCache.get(cacheKey);
 	if (cached) {
 		return cached;

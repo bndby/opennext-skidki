@@ -1,4 +1,4 @@
-const CACHE_NAME = "discount-cards-v5";
+const CACHE_NAME = "discount-cards-v6";
 const APP_SHELL = ["/", "/offline", "/cards/new", "/manifest.webmanifest", "/favicon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -68,6 +68,10 @@ function isNextStaticAsset(url) {
 	return url.pathname.startsWith("/_next/static/");
 }
 
+function isApiRequest(url) {
+	return url.pathname.startsWith("/api/");
+}
+
 async function cachePut(request, response) {
 	if (!response.ok) {
 		return;
@@ -88,6 +92,11 @@ self.addEventListener("fetch", (event) => {
 	const isSameOrigin = url.origin === self.location.origin;
 
 	if (!isSameOrigin) {
+		return;
+	}
+
+	if (isApiRequest(url)) {
+		event.respondWith(fetch(request));
 		return;
 	}
 

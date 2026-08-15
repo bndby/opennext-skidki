@@ -3,6 +3,8 @@
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
+import { toStoredBarcodeFormat } from "@/lib/barcode/formats";
+
 type BarcodeScannerProps = {
 	onDetected: (value: string, format: string) => void;
 };
@@ -97,7 +99,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 					stopControls?.stop();
 					setIsScanning(false);
 					setStatus(null);
-					onDetectedRef.current(result.getText(), result.getBarcodeFormat().toString());
+					onDetectedRef.current(result.getText(), toStoredBarcodeFormat(result.getBarcodeFormat()));
 				});
 				setStatus("Наведите камеру на штрихкод");
 			} catch (cause) {
@@ -156,7 +158,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 
 		try {
 			const result = await reader.decodeFromImageUrl(objectUrl);
-			onDetectedRef.current(result.getText(), result.getBarcodeFormat().toString());
+			onDetectedRef.current(result.getText(), toStoredBarcodeFormat(result.getBarcodeFormat()));
 			setStatus(null);
 		} catch (cause) {
 			const message = cause instanceof Error ? cause.message : "штрихкод не найден";

@@ -1,5 +1,7 @@
 "use client";
 
+import "leaflet/dist/leaflet.css";
+
 import { useEffect, useRef } from "react";
 import type { Layer, Map as LeafletMap } from "leaflet";
 
@@ -25,7 +27,7 @@ export function StoreRouteMap({ userPosition, storePosition, routePath, storeNam
 				return;
 			}
 
-			const [{ default: L }] = await Promise.all([import("leaflet"), import("leaflet/dist/leaflet.css")]);
+			const { default: L } = await import("leaflet");
 			if (cancelled) {
 				return;
 			}
@@ -38,6 +40,11 @@ export function StoreRouteMap({ userPosition, storePosition, routePath, storeNam
 				L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 					attribution: "&copy; OpenStreetMap contributors",
 				}).addTo(map);
+
+				if (cancelled) {
+					map.remove();
+					return;
+				}
 
 				mapInstanceRef.current = map;
 			}
@@ -76,7 +83,8 @@ export function StoreRouteMap({ userPosition, storePosition, routePath, storeNam
 					{
 						color: "#1976d2",
 						weight: 4,
-						opacity: 0.85,
+						opacity: 0.75,
+						dashArray: "8 10",
 					},
 				);
 				polyline.addTo(map);
@@ -99,7 +107,7 @@ export function StoreRouteMap({ userPosition, storePosition, routePath, storeNam
 		}
 
 		setupMap().catch(() => {
-			// Silent fallback: map remains empty when tiles/routing are unavailable.
+			// Карта остаётся пустой, если тайлы недоступны.
 		});
 
 		return () => {

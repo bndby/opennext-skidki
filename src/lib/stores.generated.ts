@@ -121,7 +121,7 @@ export const GENERATED_STORE_BRANDS = [
     "defaultCardColor": "#1b1b1b",
     "match": [
       "\\bvarka\\b",
-      "варка"
+      "\\bварка\\b"
     ],
     "description": "Сеть магазинов VARKA.",
     "logoSrc": "/store-logos/varka.svg"
