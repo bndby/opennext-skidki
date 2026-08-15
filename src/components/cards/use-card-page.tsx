@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { BarcodePreview } from "@/components/cards/barcode-preview";
+import { TopAppBar } from "@/components/ui/top-app-bar";
 import { geocodeStoreName } from "@/lib/geocoding/geocode-store";
 import { getCurrentPosition } from "@/lib/geolocation/get-current-position";
 import { estimateWalkingDurationSec, distanceInKm } from "@/lib/geo/distance";
@@ -149,6 +150,7 @@ export function UseCardPage() {
 	if (notFound) {
 		return (
 			<div className="app-container app-container--page">
+				<TopAppBar title="Карточка" backHref="/" />
 				<p className="alert alert--error">Карточка не найдена.</p>
 			</div>
 		);
@@ -157,7 +159,8 @@ export function UseCardPage() {
 	if (!card) {
 		return (
 			<div className="app-container app-container--page">
-				<p className="text-muted">Загрузка...</p>
+				<TopAppBar title="Карточка" backHref="/" />
+				<p className="text-muted text-small">Загрузка</p>
 			</div>
 		);
 	}
@@ -180,67 +183,58 @@ export function UseCardPage() {
 	return (
 		<div className="app-container app-container--page">
 			<div className="stack">
-				<div className="row row--center row--gap-sm">
-					<Link href="/" className="btn btn--ghost btn--fit" aria-label="Назад">
-						<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-							<path
-								d="M15 6L9 12L15 18"
-								stroke="currentColor"
-								strokeWidth="2.2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
-					</Link>
-					<h1 className="title-xl">{card.storeName}</h1>
-					<span className="chip chip--muted" aria-label={`Использовано ${card.usageCount} раз`}>
-						{card.usageCount}
-					</span>
-					<div className="row row--center row--gap-sm">
-						<Link href={`/cards/${card.id}/edit`} className="icon-btn" aria-label="Редактировать" prefetch>
-							<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-								<path
-									d="M4 20h4l10.5-10.5a1.4 1.4 0 0 0 0-2L16.5 5a1.4 1.4 0 0 0-2 0L4 15.5V20Z"
-									stroke="currentColor"
-									strokeWidth="1.8"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-								<path d="m13.5 6 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-							</svg>
-						</Link>
-						<button
-							type="button"
-							className="icon-btn icon-btn--danger"
-							aria-label="Удалить"
-							disabled={isDeleting}
-							onClick={() => {
-								void handleDelete();
-							}}
-						>
-							<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-								<path
-									d="M4 7h16M9 7V5h6v2m-8 0 1 12h8l1-12M10 11v5m4-5v5"
-									stroke="currentColor"
-									strokeWidth="1.8"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</button>
-					</div>
-				</div>
+				<TopAppBar
+					title={card.storeName}
+					backHref="/"
+					trailing={
+						<>
+							<span className="chip chip--muted" aria-label={`Использовано ${card.usageCount} раз`}>
+								{card.usageCount}
+							</span>
+							<Link href={`/cards/${card.id}/edit`} className="icon-btn" aria-label="Редактировать" prefetch>
+								<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path
+										d="M4 20h4l10.5-10.5a1.4 1.4 0 0 0 0-2L16.5 5a1.4 1.4 0 0 0-2 0L4 15.5V20Z"
+										stroke="currentColor"
+										strokeWidth="1.8"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+									<path d="m13.5 6 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+								</svg>
+							</Link>
+							<button
+								type="button"
+								className="icon-btn icon-btn--danger"
+								aria-label="Удалить"
+								disabled={isDeleting}
+								onClick={() => {
+									void handleDelete();
+								}}
+							>
+								<svg className="icon-btn__svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path
+										d="M4 7h16M9 7V5h6v2m-8 0 1 12h8l1-12M10 11v5m4-5v5"
+										stroke="currentColor"
+										strokeWidth="1.8"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</button>
+						</>
+					}
+				/>
 				<article
-					className="card-item card-item--wide card-item--transition-target"
-					style={{ borderLeftColor: card.color, viewTransitionName: ACTIVE_CARD_TRANSITION_NAME }}
+					className="pass"
+					style={{ ["--card-accent" as string]: card.color, viewTransitionName: ACTIVE_CARD_TRANSITION_NAME }}
 				>
-					<div className="stack">
-						<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
-					</div>
+					<div className="pass__accent" aria-hidden="true" />
+					<BarcodePreview value={card.barcodeValue} format={card.barcodeFormat} />
 				</article>
 				<section className="store-map-block">
 					<h2 className="title-md">Ближайший магазин</h2>
-					{isMapLoading ? <p className="text-muted text-small">Определяем ближайший магазин...</p> : null}
+					{isMapLoading ? <p className="text-muted text-small">Определяем магазин</p> : null}
 					{!isMapLoading && nearestStoreCoords && userPosition ? (
 						<>
 							<StoreRouteMap
@@ -251,18 +245,18 @@ export function UseCardPage() {
 							/>
 							<p className="text-muted text-small">
 								{routeDurationLabel
-									? `Оценка пешком по прямой: ${routeDurationLabel}`
+									? `Пешком около ${routeDurationLabel}`
 									: "Не удалось оценить время в пути."}
 							</p>
 							{directionsUrl ? (
-								<a className="btn btn--outline btn--fit" href={directionsUrl} target="_blank" rel="noreferrer">
-									Открыть маршрут в картах
+								<a className="btn btn--outline btn--block" href={directionsUrl} target="_blank" rel="noreferrer">
+									Маршрут
 								</a>
 							) : null}
 						</>
 					) : null}
 					{!isMapLoading && (!nearestStoreCoords || !userPosition) ? (
-						<p className="text-muted text-small">Не удалось определить вашу позицию или ближайший магазин.</p>
+						<p className="text-muted text-small">Не удалось определить позицию или магазин.</p>
 					) : null}
 				</section>
 			</div>

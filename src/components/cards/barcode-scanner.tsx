@@ -172,7 +172,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 
 	return (
 		<div className="stack">
-			<h3 className="title-md">Сканирование штрихкода</h3>
+			<h3 className="title-md">Сканер</h3>
 
 			{error ? <p className="alert alert--warning">{error}</p> : null}
 			{status ? (
@@ -200,12 +200,12 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 				) : null}
 			</div>
 
-			<div className="row row--gap-sm row--wrap">
+			<div className="btn-row">
 				<label
 					className={`btn ${preferPhotoCapture ? "btn--primary" : "btn--outline"}`}
 					style={{ cursor: isDecodingPhoto || isScanning ? "not-allowed" : "pointer" }}
 				>
-					Сфотографировать штрихкод
+					Фото
 					<input
 						ref={fileInputRef}
 						type="file"
@@ -227,7 +227,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 					}}
 					disabled={isScanning || isDecodingPhoto}
 				>
-					Live-камера
+					Камера
 				</button>
 
 				{isScanning ? (
@@ -239,7 +239,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 							setStatus(null);
 						}}
 					>
-						Остановить
+						Стоп
 					</button>
 				) : null}
 			</div>

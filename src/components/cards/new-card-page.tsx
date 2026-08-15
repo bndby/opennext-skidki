@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { CardForm } from "@/components/cards/card-form";
+import { TopAppBar } from "@/components/ui/top-app-bar";
 import { createCard } from "@/lib/storage/cards-repository";
 
 export function NewCardPage() {
@@ -12,12 +12,9 @@ export function NewCardPage() {
 	return (
 		<div className="app-container app-container--page">
 			<div className="stack">
-				<Link href="/" className="btn btn--ghost btn--fit">
-					Назад
-				</Link>
-				<h1 className="title-xl">Новая карточка</h1>
+				<TopAppBar title="Новая карточка" backHref="/" />
 				<CardForm
-					submitLabel="Сохранить карточку"
+					submitLabel="Сохранить"
 					enableBrandPresetPicker
 					onSubmit={async (payload) => {
 						await createCard(payload);

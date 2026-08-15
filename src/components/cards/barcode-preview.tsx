@@ -30,12 +30,12 @@ export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 		try {
 			JsBarcode(svgRef.current, value, {
 				format: jsBarcodeFormat,
-				displayValue: true,
+				displayValue: false,
 				lineColor: "#000000",
 				background: "#ffffff",
-				height: 100,
-				margin: 12,
-				fontSize: 16,
+				height: 96,
+				margin: 8,
+				width: 2,
 			});
 			setError(null);
 		} catch {
@@ -47,13 +47,8 @@ export function BarcodePreview({ value, format }: BarcodePreviewProps) {
 	return (
 		<div className="stack stack--tight">
 			<svg ref={svgRef} style={{ display: jsBarcodeFormat && !error ? "block" : "none", margin: "0 auto", maxWidth: "100%" }} />
-			<p className="barcode-value" style={{ textAlign: "center" }}>
-				{value}
-			</p>
+			<p className="barcode-value">{value}</p>
 			{error ? <p className="alert alert--warning">{error}</p> : null}
-			<p className="text-muted text-small" style={{ textAlign: "center" }}>
-				Формат: {jsBarcodeFormat ?? format}
-			</p>
 		</div>
 	);
 }

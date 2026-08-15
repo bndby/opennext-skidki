@@ -23,6 +23,8 @@ import {
 } from "@/lib/storage/cards-backup";
 import { listCards, persistStoreCoordsByStoreName } from "@/lib/storage/cards-repository";
 import type { DiscountCard, GeoPoint } from "@/types/discount-card";
+import { OverflowMenu, MenuButton, MenuFileItem } from "@/components/ui/overflow-menu";
+import { TopAppBar } from "@/components/ui/top-app-bar";
 import { CardListSection } from "./card-list-section";
 
 export function HomePage() {
@@ -237,55 +239,46 @@ export function HomePage() {
 		}
 	}
 
+	const statusText = !loading && isOnline && isLocating
+		? "Определяем местоположение"
+		: !loading && isOnline && isResolvingNearestStores
+			? "Ищем ближайшие магазины"
+			: null;
+
 	return (
 		<div className="app-container app-container--with-fab">
 			<div className="stack">
-				<div className="row row--between row--center row--wrap">
-					<h1 className="title-xl">Карты</h1>
-					<div className="row row--gap-sm">
-						<button type="button" className="btn btn--outline btn--fit" onClick={() => void handleExport()}>
-							Экспорт
-						</button>
-						<label className={`btn btn--outline btn--fit ${isImporting ? "btn--disabled" : ""}`}>
-							Импорт
-							<input
-								type="file"
+				<TopAppBar
+					large
+					title="Карты"
+					trailing={
+						<OverflowMenu label="Ещё">
+							<MenuButton onClick={() => void handleExport()}>Экспорт</MenuButton>
+							<MenuFileItem
 								accept="application/json,.json"
-								className="sr-only"
 								disabled={isImporting}
 								onChange={(event) => {
 									void handleImport(event);
 								}}
-							/>
-						</label>
-					</div>
-				</div>
+							>
+								Импорт
+							</MenuFileItem>
+						</OverflowMenu>
+					}
+				/>
 				{backupMessage ? <p className="alert alert--success">{backupMessage}</p> : null}
 				{backupError ? <p className="alert alert--error">{backupError}</p> : null}
-				<p className="text-muted text-small">Карточки хранятся только на этом устройстве. Сделайте экспорт, чтобы не потерять их.</p>
-				{loading ? <p className="text-muted">Загрузка карточек...</p> : null}
-				<div className="stack stack--tight stack--loading-indicators" aria-live="polite">
-					<div
-						className="row row--center row--gap-sm"
-						style={{ visibility: !loading && isOnline && isLocating ? "visible" : "hidden" }}
-					>
+				{loading ? <p className="text-muted text-small">Загрузка</p> : null}
+				{statusText ? (
+					<div className="status-line" aria-live="polite">
 						<span className="spinner" aria-hidden="true" />
-						<p className="text-muted text-small">Определяем ваше местоположение...</p>
+						<span>{statusText}</span>
 					</div>
-					<div
-						className="row row--center row--gap-sm"
-						style={{
-							visibility: !loading && isOnline && !isLocating && isResolvingNearestStores ? "visible" : "hidden",
-						}}
-					>
-						<span className="spinner" aria-hidden="true" />
-						<p className="text-muted text-small">Ищем ближайшие магазины...</p>
-					</div>
-				</div>
+				) : null}
 
 				{!loading && cards.length === 0 ? (
 					<section className="empty-state">
-						<p>Карточек пока нет. Добавьте первую карточку.</p>
+						<p>Добавьте первую карточку. Данные хранятся только на устройстве — сделайте экспорт в меню.</p>
 					</section>
 				) : null}
 
@@ -295,13 +288,12 @@ export function HomePage() {
 						cards={sortedCards}
 						userPosition={position}
 						showDistance={Boolean(position)}
-						isOnline={isOnline}
 					/>
 				) : null}
 			</div>
 			<Link href="/cards/new" className="fab" aria-label="Добавить карточку" prefetch>
 				<svg className="fab__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-					<path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+					<path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
 				</svg>
 			</Link>
 		</div>

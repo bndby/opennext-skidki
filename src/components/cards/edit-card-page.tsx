@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { CardForm } from "@/components/cards/card-form";
+import { TopAppBar } from "@/components/ui/top-app-bar";
 import { getCardById, removeCard, updateCard } from "@/lib/storage/cards-repository";
 import type { DiscountCard } from "@/types/discount-card";
 
@@ -29,6 +29,7 @@ export function EditCardPage() {
 	if (notFound) {
 		return (
 			<div className="app-container app-container--page">
+				<TopAppBar title="Редактирование" backHref="/" />
 				<p className="alert alert--error">Карточка не найдена.</p>
 			</div>
 		);
@@ -37,7 +38,8 @@ export function EditCardPage() {
 	if (!card) {
 		return (
 			<div className="app-container app-container--page">
-				<p className="text-muted">Загрузка...</p>
+				<TopAppBar title="Редактирование" backHref="/" />
+				<p className="text-muted text-small">Загрузка</p>
 			</div>
 		);
 	}
@@ -45,13 +47,10 @@ export function EditCardPage() {
 	return (
 		<div className="app-container app-container--page">
 			<div className="stack">
-				<Link href="/" className="btn btn--ghost btn--fit">
-					Назад
-				</Link>
-				<h1 className="title-xl">Редактирование карточки</h1>
+				<TopAppBar title="Редактирование" backHref={`/cards/${card.id}/use`} />
 				<CardForm
 					initialCard={card}
-					submitLabel="Сохранить изменения"
+					submitLabel="Сохранить"
 					enableBrandPresetPicker
 					onSubmit={async (payload) => {
 						await updateCard(card.id, payload);
@@ -60,7 +59,7 @@ export function EditCardPage() {
 				/>
 				<button
 					type="button"
-					className="btn btn--danger-outline"
+					className="btn btn--danger-outline btn--block"
 					onClick={async () => {
 						const isConfirmed = window.confirm("Удалить карточку?");
 						if (!isConfirmed) {
@@ -71,7 +70,7 @@ export function EditCardPage() {
 						router.push("/");
 					}}
 				>
-					Удалить карточку
+					Удалить
 				</button>
 			</div>
 		</div>

@@ -240,7 +240,7 @@ export function CardForm({ initialCard, submitLabel, enableBrandPresetPicker = f
 
 				{formError ? <p className="alert alert--error">{formError}</p> : null}
 
-				<button type="submit" className="btn btn--primary" disabled={!isValid || isSubmitting}>
+				<button type="submit" className="btn btn--primary btn--block" disabled={!isValid || isSubmitting}>
 					{submitLabel}
 				</button>
 			</form>
